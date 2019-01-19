@@ -1,3 +1,9 @@
+/*
+ * Kyle Van Meter
+ * pe1
+ * These files implement the Point class, and test them
+ */
+
 class Point {
 public:
   int get_x();
