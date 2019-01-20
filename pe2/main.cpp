@@ -1,7 +1,7 @@
 /*
  * Kyle Van Meter
- * pe1
- * These files implement the Point class, and test them
+ * pe2
+ * These files implement the generalized Point class, and test them
  */
 
 #include <iostream>

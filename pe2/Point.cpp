@@ -1,6 +1,6 @@
 /*
  * Kyle Van Meter
- * pe1
+ * pe2
  * These files implement the Point class, and test them
  */
 
@@ -35,11 +35,12 @@ void Point::update_val(int dim, int val) {
 }
 
 /*
- * Calculates the distance between two x,y pairs of the Point class
+ * Calculates the distance between two n-dimensional vectors
  * @param two instantitations of the Point class
  * @return the euclidean distance between the two pairs of points
  */
 double Point::Distance(Point a, Point b) {
+  //Test if the dimensions between the two are different in which case we choose to throw an error
   if(a._val.size() != b._val.size()) {
     throw std::invalid_argument("In Distance(Point a, Point b): dimensions of arguments do not match.");
   }
