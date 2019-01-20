@@ -5,25 +5,41 @@
  */
 
 #include <iostream>
+#include <algorithm>
+#include <iterator> //for ostream
 #include "Point.h"
 
 int main(int argc, char* argv[]) {
   Point p, q, r;
 
-  p.set_x(1);
-  p.set_y(3);
+  std::vector<int> a = {0,0,0};
+  p.set_val(a);
 
-  q.set_x(1);
-  q.set_y(6);
+  a = {1,1,1};
+  q.set_val(a);
 
-  r.set_x(-1);
-  r.set_y(-1);
+  a = {2,3,4};
+  r.set_val(a);
 
-  std::cout << "Point 1 at: (" << p.get_x() << ", " << p.get_y() << ")\n"
-            << "Point 2 at: (" << q.get_x() << ", " << q.get_y() << ")\n"
-            << "Point 3 at: (" << r.get_x() << ", " << r.get_y() << ")\n" << std::endl;
+  std::cout << "P1 values: { ";
+  for(auto const& x : p.get_val()) {
+    std::cout << x << " ";
+  }
+  std::cout << "}\n";
 
-  std::cout << "Distance between P1 and P2: " << p.Distance(p, q) << "\n"
-            << "Distance between P2 and P3: " << q.Distance(q, r) << "\n"
-            << "Distance between P1 and P3: " << r.Distance(r, p) << "\n" << std::endl;
+  std::cout << "P2 values: { ";
+  for(auto const& x : q.get_val()) {
+    std::cout << x << " ";
+  }
+  std::cout << "}\n";
+
+  std::cout << "P3 values: { ";
+  for(auto const& x : r.get_val()) {
+    std::cout << x << " ";
+  }
+  std::cout << "}\n";
+
+  std::cout << "Distance between P1, P2: " << p.Distance(p, q) << "\n"
+            << "Distance between P2, P3: " << q.Distance(q, r) << "\n"
+            << "Distance between P1, P3: " << r.Distance(p, r) << std::endl;
 }

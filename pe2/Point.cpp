@@ -7,38 +7,51 @@
 #include "Point.h"
 #include <math.h> //sqrt
 #include <algorithm> //minmax
+#include <vector>
+#include <stdexcept> //invalid_argument
 
-int Point::get_x() {
-  return(_x);
+std::vector<int> Point::get_val() {
+  return(_val);
 }
 
-int Point::get_y() {
-  return(_y);
+int Point::get_nth_val(int dim) {
+  if(dim > (int)_val.size()) {
+    throw std::invalid_argument("In get_val(int dim): dimension outside of range.");
+  }
+
+  return(_val[dim]);
 }
 
-void Point::set_x(int x) {
-    _x = x;
+void Point::set_val(std::vector<int> a) {
+  _val = a;
 }
 
-void Point::set_y(int y) {
-    _y = y;
+void Point::update_val(int dim, int val) {
+  if(dim > (int)_val.size()) {
+    throw std::invalid_argument("In update_val(int dim, int val): dimension outside of range.");
+  }
+
+  _val[dim] = val;
 }
+
 /*
  * Calculates the distance between two x,y pairs of the Point class
  * @param two instantitations of the Point class
  * @return the euclidean distance between the two pairs of points
  */
 double Point::Distance(Point a, Point b) {
-    //v_dist, and h_dist are the distances between just the y-components, and just the x-components
-    int v_dist, h_dist;
+  if(a._val.size() != b._val.size()) {
+    throw std::invalid_argument("In Distance(Point a, Point b): dimensions of arguments do not match.");
+  }
 
-    //value is of type std::pair() s.t value.second >= value.first
-    auto value = std::minmax({a._y, b._y});
-    v_dist = value.second - value.first;
+  int temp = 0;
+  int result = 0;
+  //for n dimensional euclidean distance c = sqrt((p_1 - q_1)^2 + (p_2 - q_2)^2 + ... (p_n - q_n)^2)
+  for(int i = 0; i <= b._val.size(); i++) {
+    temp = a._val[i] - b._val[i];
+    temp *= temp;
+    result += temp;
+  }
 
-    value = std::minmax({a._x, b._x});
-    h_dist = value.second - value.first;
-
-    //c = sqrt(a^2 + b^2)
-    return(sqrt((h_dist * h_dist) + (v_dist * v_dist)));
+  return(sqrt(result));
 }
