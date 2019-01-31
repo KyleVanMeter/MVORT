@@ -21,7 +21,7 @@ function git_indicator {
     # be very very careful of spacing in bash-land!
     # the following if statements are examples -- fill them in, rearrange them, etc to your
     # hearts content 
-    if [[ $git_status =~ "A" ]] && [[ $git_status =~ "??" ]]; then
+    if [[ $git_status =~ "A" ]] || [[ $git_status =~ "??" ]]; then
         echo -ne " uC" # echo out something to indicate the state that you just tested for
     elif [[ ! $git_status =~ "fatal" ]]; then
         echo -ne ""
@@ -31,6 +31,7 @@ function git_indicator {
 }
 
 
+#asdf
 function git_branch {
     local git_status="$(git status 2> /dev/null)"
     local on_branch="On branch ([^${IFS}]*)"
