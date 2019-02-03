@@ -3,11 +3,33 @@
 
 #define BOARDDIM 4
 #include <vector>
+#include <random>
 #include "Player.h"
 
 enum class SquareType { Wall, Exit, Empty, Human, Enemy, Treasure };
 
 std::string SquareTypeStringify(SquareType sq);
+
+/*
+ * Why is this a singleton?  There are several cases where we need to get a random number across different classes.  Instantiating the random number generator needed, and seeding it is expensive to do repeatedly.  So this is an attempt to create only one generator, and have it be used by all other classes.
+ * Of course if we were doing something over a longer period, like simulating Brownian motion, we would have to be careful about correlation from a single generator.  In our case we should be fine.
+ */
+class Generator {
+ public:
+  static Generator& GetInstance() {
+    static Generator instance;
+
+    return instance;
+  }
+
+  int GetRandomInt(int min, int max);
+ private:
+  std::mt19937 SetGenerator();
+  std::mt19937 gen_;
+  std::uniform_int_distribution<> distr_;
+
+  Generator(); //The object controls its constructor
+};
 
 class Board {
  public:

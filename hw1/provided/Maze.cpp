@@ -1,5 +1,29 @@
 #include "Maze.h"
-#include <random>
+#include <assert.h>
+
+Generator::Generator() {
+  gen_ = SetGenerator();
+}
+
+std::mt19937 Generator::SetGenerator() {
+  /*
+   * Gets random number from hardware to seed the Mersenne Twister random number
+   * generator to get random numbers uniformly.
+   */
+  std::random_device rnd;
+  std::mt19937 eng(rnd());
+
+  return eng;
+}
+
+int Generator::GetRandomInt(int min, int max) {
+  assert(min < max);
+  std::uniform_int_distribution<> dist(min, max);
+  distr_ = dist;
+
+  return(distr_(gen_));
+}
+
 
 std::string SquareTypeStringify(SquareType sq) {
   std::string result;
@@ -11,18 +35,6 @@ std::string SquareTypeStringify(SquareType sq) {
                                       "◍", "◎", "●", "◐", "◑", "◒", "◓", "◔",
                                       "◕", "◖", "◗"};
 
-  /*
-   * used for getting random treasure icon.  Gets random number from hardware to
-   * seed the Mersenne Twister random number generator to get random numbers
-   * uniformly
-   *
-   * TODO: The generator itself should probably exist in some different space so
-   * we don't unnecessarily recreate the objects every time the function is
-   * called
-   */
-  std::random_device rnd;
-  std::mt19937 eng(rnd());
-  std::uniform_int_distribution<> distro(0, lootVec.size());
 
   if(sq == SquareType::Wall) {
     result = "█";
@@ -37,7 +49,7 @@ std::string SquareTypeStringify(SquareType sq) {
   }
 
   if(sq == SquareType::Empty) {
-    result = " ";
+    result = ":";
 
     return result;
   }
@@ -56,7 +68,11 @@ std::string SquareTypeStringify(SquareType sq) {
   }
 
   if(sq == SquareType::Treasure) {
-    result = lootVec[distro(eng)];
+    /*
+     * This is how we call our singleton Generator class.  Get a random number
+     * int from the specified range so we can get randomized treasure icons
+     */
+    result = lootVec[Generator::GetInstance().GetRandomInt(0, lootVec.size())];
 
     return result;
   }
@@ -100,4 +116,28 @@ std::vector<Position> Board::GetMoves(Player *p) {
   }
 
   return moves;
+}
+
+bool Board::MovePlayer(Player *p, Position pos) {
+  /*
+   * Here we are checking if the position to move to is in the list of legal
+   * moves.
+   */
+  for(auto i : GetMoves(p)) {
+    if(pos == i) {
+      p->SetPosition(pos);
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
+SquareType Board::GetExitOccupant() {
+  return SquareType::Exit;
+}
+
+void Maze::NewGame(Player *human, const int enemies) {
+  
 }
