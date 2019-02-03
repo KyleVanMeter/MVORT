@@ -24,7 +24,6 @@ int Generator::GetRandomInt(int min, int max) {
   return(distr_(gen_));
 }
 
-
 std::string SquareTypeStringify(SquareType sq) {
   std::string result;
 
@@ -49,7 +48,7 @@ std::string SquareTypeStringify(SquareType sq) {
   }
 
   if(sq == SquareType::Empty) {
-    result = ":";
+    result = " ";
 
     return result;
   }
@@ -79,6 +78,16 @@ std::string SquareTypeStringify(SquareType sq) {
 
   result = "?";
   return result;
+}
+
+Board::Board() {
+  for(int i = 0; i < BOARDDIM; i++) {
+    for(int j = 0; j < BOARDDIM; j++) {
+      arr_[i][j] = SquareType::Empty;
+    }
+  }
+
+  arr_[BOARDDIM-1][BOARDDIM-1] = SquareType::Exit;
 }
 
 SquareType Board::get_square_value(Position pos) const {

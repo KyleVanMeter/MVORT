@@ -20,10 +20,20 @@ int main() {
     + p1.ToRelativePosition({BOARDDIM+1,BOARDDIM+1}) + "\n\n";
 
 
-  int test = Generator::GetInstance().GetRandomInt(0, 10);
+  int test0 = Generator::GetInstance().GetRandomInt(0, 10);
   int test1 = Generator::GetInstance().GetRandomInt(0, 10);
 
-  std::cout << "Testing random class singleton: " << test <<
-    " " << test1 << "\n";
+  std::cout << "Testing random class singleton: " << test0 <<" " << test1
+            << "\nTesting board initialization: \n\n";
+
+  Board b;
+
+  for(int i = 0; i < BOARDDIM; i++) {
+    for(int j = 0; j < BOARDDIM; j++) {
+      std::cout << SquareTypeStringify(b.get_square_value({i,j}));
+    }
+    std::cout << "\n";
+  }
+
   return 0;
 }
