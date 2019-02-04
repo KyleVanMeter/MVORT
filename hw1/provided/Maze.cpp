@@ -67,6 +67,7 @@ std::string SquareTypeStringify(SquareType sq) {
 }
 
 Board::Board() {
+  //TODO: possibly move this down into the Maze constructor as an if/else block
   for(int i = 0; i < BOARDDIM; i++) {
     for(int j = 0; j < BOARDDIM; j++) {
       arr_[i][j] = SquareType::Empty;
@@ -74,10 +75,15 @@ Board::Board() {
   }
 
   arr_[BOARDDIM-1][BOARDDIM-1] = SquareType::Exit;
+  arr_[0][0] = SquareType::Human;
 }
 
 SquareType Board::get_square_value(Position pos) const {
   return arr_[pos.row][pos.col];
+}
+
+void Board::SetSquareValue(Position pos, SquareType value) {
+  arr_[pos.row][pos.col] = value;
 }
 
 std::vector<Position> Board::GetMoves(Player *p) {
@@ -133,6 +139,33 @@ SquareType Board::GetExitOccupant() {
   return SquareType::Exit;
 }
 
+Maze::Maze() {
+  int random;
+  /*
+   * We are starting at [0][1] as [0][0] will always be SquareType::Human, also
+   * walls are a 20% chance on each square so we just pick a random number
+   * between 0, and 4 (1 in 5 chance), and 0 and 9 (1 in 10) for treasure
+   */
+  for(int i = 0; i < BOARDDIM; i++) {
+    for(int j = 1; j < BOARDDIM; j++) {
+      random = Generator::GetInstance().GetRandomInt(0, 4);
+
+      if(random == 4) {
+        board_->SetSquareValue({i,j}, SquareType::Wall);
+      }
+    }
+  }
+
+  for (int i = 0; i < BOARDDIM; i++) {
+    for (int j = 1; j < BOARDDIM; j++) {
+      random = Generator::GetInstance().GetRandomInt(0, 9);
+
+      if (random == 4) {
+        board_->SetSquareValue({i, j}, SquareType::Treasure);
+      }
+    }
+  }
+}
 void Maze::NewGame(Player *human, const int enemies) {
   
 }
