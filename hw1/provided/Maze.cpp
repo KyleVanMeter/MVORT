@@ -12,6 +12,7 @@ std::mt19937 Generator::SetGenerator() {
    */
   std::random_device rnd;
   std::mt19937 eng(rnd());
+  std::vector<int> a;
 
   return eng;
 }
@@ -34,50 +35,35 @@ std::string SquareTypeStringify(SquareType sq) {
                                       "◍", "◎", "●", "◐", "◑", "◒", "◓", "◔",
                                       "◕", "◖", "◗"};
 
+  /*
+   * This is how we call our singleton Generator class.  Get a random number
+   * int from the specified range so we can get randomized treasure icons
+   */
+  result = lootVec[Generator::GetInstance().GetRandomInt(0, lootVec.size())];
 
-  if(sq == SquareType::Wall) {
-    result = "█";
+  /*
+   * Order matters here!
+   */
+  std::vector<std::string> symbolVec =
+  { "█",
+    "╳",
+    " ",
+    "◯",
+    "▣",
+    result };
 
-    return result;
+  /*
+   * The idea here is that we can iterate over the enum, and associate each
+   * items numerical value with the correct element in the vector symbolVec
+   */
+  for(SquareType iter = SquareType::Wall; iter != SquareType::MAX;
+       iter = static_cast<SquareType>(static_cast<int>(iter) + 1)) {
+    if(sq == iter) {
+      return(symbolVec.at(static_cast<int>(iter)));
+    }
   }
 
-  if(sq == SquareType::Exit) {
-    result = "╳";
-
-    return result;
-  }
-
-  if(sq == SquareType::Empty) {
-    result = " ";
-
-    return result;
-  }
-
-  if(sq == SquareType::Human) {
-    result = "◯";
-
-    return result;
-  }
-
-  if(sq == SquareType::Enemy) {
-    result = "▣";
-
-    return result;
-
-  }
-
-  if(sq == SquareType::Treasure) {
-    /*
-     * This is how we call our singleton Generator class.  Get a random number
-     * int from the specified range so we can get randomized treasure icons
-     */
-    result = lootVec[Generator::GetInstance().GetRandomInt(0, lootVec.size())];
-
-    return result;
-  }
-
-  result = "?";
-  return result;
+  return("?");
 }
 
 Board::Board() {

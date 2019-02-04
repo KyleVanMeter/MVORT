@@ -6,7 +6,7 @@
 #include <random>
 #include "Player.h"
 
-enum class SquareType { Wall, Exit, Empty, Human, Enemy, Treasure };
+enum class SquareType { Wall, Exit, Empty, Human, Enemy, Treasure, MAX };
 
 std::string SquareTypeStringify(SquareType sq);
 
