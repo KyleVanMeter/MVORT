@@ -1,5 +1,6 @@
 #include "Maze.h"
 #include <assert.h>
+#include <iostream>
 
 Generator::Generator() {
   gen_ = SetGenerator();
@@ -39,7 +40,7 @@ std::string SquareTypeStringify(SquareType sq) {
    * This is how we call our singleton Generator class.  Get a random number
    * int from the specified range so we can get randomized treasure icons
    */
-  result = lootVec[Generator::GetInstance().GetRandomInt(0, lootVec.size())];
+  result = lootVec.at(Generator::GetInstance().GetRandomInt(0, lootVec.size()-1));
 
   /*
    * Order matters here!
@@ -47,10 +48,11 @@ std::string SquareTypeStringify(SquareType sq) {
   std::vector<std::string> symbolVec =
   { "█",
     "╳",
-    " ",
+    ".",
     "◯",
     "▣",
-    result };
+    result
+  };
 
   /*
    * The idea here is that we can iterate over the enum, and associate each
@@ -140,32 +142,48 @@ SquareType Board::GetExitOccupant() {
 }
 
 Maze::Maze() {
-  int random;
+  int random = 0;
+  board_ = new Board;
+
   /*
    * We are starting at [0][1] as [0][0] will always be SquareType::Human, also
    * walls are a 20% chance on each square so we just pick a random number
    * between 0, and 4 (1 in 5 chance), and 0 and 9 (1 in 10) for treasure
    */
+
   for(int i = 0; i < BOARDDIM; i++) {
     for(int j = 1; j < BOARDDIM; j++) {
-      random = Generator::GetInstance().GetRandomInt(0, 4);
+      random = Generator::GetInstance().GetRandomInt(0, 9);
 
       if(random == 4) {
         board_->SetSquareValue({i,j}, SquareType::Wall);
+      } else {
+        board_->SetSquareValue({i,j}, SquareType::Empty);
       }
     }
   }
 
-  for (int i = 0; i < BOARDDIM; i++) {
-    for (int j = 1; j < BOARDDIM; j++) {
+  for(int i = 0; i < BOARDDIM; i++) {
+    for(int j = 1; j < BOARDDIM; j++) {
       random = Generator::GetInstance().GetRandomInt(0, 9);
 
-      if (random == 4) {
+      if(random == 9 &&
+         board_->get_square_value({i, j}) != SquareType::Wall) {
         board_->SetSquareValue({i, j}, SquareType::Treasure);
       }
     }
   }
+
+  board_->SetSquareValue({BOARDDIM-1,BOARDDIM-1}, SquareType::Exit);
 }
-void Maze::NewGame(Player *human, const int enemies) {
-  
+
+void Maze::PrintMaze() {
+  // for debug
+  for (int i = 0; i < BOARDDIM; i++) {
+    for (int j = 0; j < BOARDDIM; j++) {
+      std::cout << SquareTypeStringify(board_->get_square_value({i, j}));
+    }
+
+    std::cout << "\n";
+  }
 }

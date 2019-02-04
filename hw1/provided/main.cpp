@@ -35,5 +35,12 @@ int main() {
     std::cout << "\n";
   }
 
+  std::cout << "Creating Maze object... ";
+  Maze a;
+
+  std::cout << "???\n";
+  std::cout << "a.print():\n";
+  a.PrintMaze();
+
   return 0;
 }

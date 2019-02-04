@@ -72,6 +72,8 @@ public:
 	// TODO: implement these functions
 	Maze(); // constructor
 
+  void PrintMaze();
+
 	// initialize a new game, given one human player and
 	// a number of enemies to generate
 	void NewGame(Player *human, const int enemies);
