@@ -2,7 +2,9 @@
 #define _MAZE_H_
 
 #define BOARDDIM 4
+#include <iostream>
 #include <vector>
+#include <queue>
 #include <random>
 #include "Player.h"
 
@@ -56,7 +58,14 @@ class Board {
   SquareType GetExitOccupant();
 
   // You probably want to implement this
-  friend std::ostream& operator<<(std::ostream& os, const Board &b);
+  friend std::ostream& operator<<(std::ostream& os, const Board &b) {
+    for(int i = 0; i < BOARDDIM; i++) {
+      for(int j = 0; j < BOARDDIM; j++) {
+        os << SquareTypeStringify(b.arr_[i][j]);
+      }
+      os << "\n";
+    }
+  }
 
  private:
 	SquareType arr_[BOARDDIM][BOARDDIM];
@@ -69,7 +78,6 @@ class Board {
 
 class Maze {
 public:
-	// TODO: implement these functions
 	Maze(); // constructor
 
   void PrintMaze();
@@ -91,13 +99,45 @@ public:
 	// You probably want to implement these functions as well
 	// string info about the game's conditions after it is over
 	std::string GenerateReport();
-	friend std::ostream& operator<<(std::ostream& os, const Maze &m);
+
+  /*
+   * Currently this works and prints both the turn order queue, and the board
+   * itself.  However, it will crash if used in a way such as:
+   * Maze a;
+   * std::cout << a << "\n";
+   * but will work if we write it as:
+   * std::cout << a;
+   * I have no idea why this is yet.  So in the mean time make a separate call
+   * to ostream for anything in the statement after the Maze object
+   */
+	friend std::ostream& operator<<(std::ostream& os, const Maze &m) {
+    for(int i = 0; i < BOARDDIM; i++) {
+      for(int j = 0; j < BOARDDIM; j++) {
+        os << SquareTypeStringify(m.board_->get_square_value({i,j}));
+      }
+      os << "\n";
+    }
+
+    std::queue<Player *> cpy = m.turnOrder_;
+    Player * temp;
+
+    os << "{ ";
+    while(!cpy.empty()) {
+      temp = cpy.front();
+      os << temp->Stringify() << " ";
+
+      cpy.pop();
+    }
+
+    os << "}\n";
+  }
 
 private:
 	Board *board_;
 	std::vector<Player *> players_;
 	int turn_count_;
 
+  std::queue<Player *> turnOrder_;
 	// you may add more fields, as needed
 
 };  // class Maze

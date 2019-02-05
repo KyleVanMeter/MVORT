@@ -28,7 +28,6 @@ int Generator::GetRandomInt(int min, int max) {
 
 std::string SquareTypeStringify(SquareType sq) {
   std::string result;
-
   std::vector<std::string> lootVec = {"▭", "▮", "▯", "▰", "▱", "▲", "△", "▴",
                                       "▵", "▶", "▷", "▸", "▹", "►", "▻", "▼",
                                       "▽", "▾", "▿", "◀", "◁", "◂", "◃", "◄",
@@ -179,11 +178,42 @@ Maze::Maze() {
 
 void Maze::PrintMaze() {
   // for debug
+  std::cout << "\n";
   for (int i = 0; i < BOARDDIM; i++) {
     for (int j = 0; j < BOARDDIM; j++) {
       std::cout << SquareTypeStringify(board_->get_square_value({i, j}));
     }
 
     std::cout << "\n";
+  }
+}
+
+void Maze::NewGame(Player *human, const int enemies) {
+  std::string name = "Monster_";
+  turnOrder_.push(human);
+
+  for(int x = 0; x < enemies; x++) {
+    int row = 0;
+    int col = 0;
+
+    /*
+     * This attempts to ensure that we do not place an enemy on a tile
+     * that is the player's starting position, a wall, or the exit
+     */
+    while ((row == 0 && col == 0) ||
+           (board_->get_square_value({row, col}) == SquareType::Wall) ||
+           (board_->get_square_value({row, col}) == SquareType::Exit)) {
+
+      row = Generator::GetInstance().GetRandomInt(0, BOARDDIM-1);
+      col = Generator::GetInstance().GetRandomInt(0, BOARDDIM-1);
+    }
+
+    name += std::to_string(x);
+    Player * mon = new Player(name, false);
+    mon->SetPosition({row,col});
+
+    board_->SetSquareValue({row, col}, SquareType::Enemy);
+
+    turnOrder_.push(mon);
   }
 }
