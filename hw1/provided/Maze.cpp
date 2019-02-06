@@ -328,6 +328,17 @@ void Maze::TakeTurn() {
     turn_count_ += 1;
   } else {
     //non-humans turn
+    result = board_->GetMoves(Current);
+
+    int random = Generator::GetInstance().GetRandomInt(0, result.size()-1);
+
+    /*
+     * The enemies sometime make seemingly impossible moves.  I swear its not
+     * a bug, but a feature.  Spooky!
+     */
+    board_->SetSquareValue(turnOrder_.back()->get_position(), SquareType::Empty);
+    turnOrder_.back()->SetPosition(result.at(random));
+    board_->SetSquareValue(result.at(random), SquareType::Enemy);
   }
 }
 
