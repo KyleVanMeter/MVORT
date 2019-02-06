@@ -250,7 +250,7 @@ void Maze::TakeTurn() {
   turnOrder_.push(Current);
 
   if(Current->is_human()) {
-    int count = 0;
+    //player's turn
     bool continueLooping = true;
     std::string input;
     std::vector<std::string> validMoves;
@@ -258,15 +258,13 @@ void Maze::TakeTurn() {
 
     std::cout << "Valid Moves are: ( ";
     for(Position i : result) {
-      count += 1;
       //std::cout << "i: { " << i.row << ", " << i.col << "} ";
       validMoves.push_back(Current->ToRelativePosition(i));
 
       std::cout << Current->ToRelativePosition(i) << " ";
     }
-    std::cout << ")\nCount = " << count;
+    std::cout << ")\n";
 
-    count = 0;
     /*
      * If the input from the user (case insensitive) matches a move in the
      * vector of strings validMoves, then stop looping, and move the player to
@@ -278,44 +276,59 @@ void Maze::TakeTurn() {
 
       std::transform(input.begin(), input.end(), input.begin(), ::toupper);
       for(std::string j : validMoves) {
-        count += 1;
         if(input == j) {
           continueLooping = false;
         }
       }
     }
+    std::cout << "\nTurn #" << turn_count_ << "\n";
 
     Position CurPosition = {
       Current->get_position().row,
       Current->get_position().col
     };
 
-    if (board_->get_square_value(turnOrder_.back()->get_position()) ==
-        SquareType::Treasure) {
-      turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
-    }
-
 
     if (input == "UP") {
       turnOrder_.back()->SetPosition({CurPosition.row - 1, CurPosition.col});
+
+      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+          SquareType::Treasure) {
+        turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
+      }
       board_->SetSquareValue({CurPosition.row - 1, CurPosition.col},
                              SquareType::Human);
       board_->SetSquareValue(CurPosition, SquareType::Empty);
     }
     if (input == "DOWN") {
       turnOrder_.back()->SetPosition({CurPosition.row + 1, CurPosition.col});
+
+      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+          SquareType::Treasure) {
+        turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
+      }
       board_->SetSquareValue({CurPosition.row + 1, CurPosition.col},
                              SquareType::Human);
       board_->SetSquareValue(CurPosition, SquareType::Empty);
     }
     if (input == "LEFT") {
       turnOrder_.back()->SetPosition({CurPosition.row, CurPosition.col - 1});
+
+      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+          SquareType::Treasure) {
+        turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
+      }
       board_->SetSquareValue({CurPosition.row, CurPosition.col - 1},
                              SquareType::Human);
       board_->SetSquareValue(CurPosition, SquareType::Empty);
     }
     if (input == "RIGHT") {
       turnOrder_.back()->SetPosition({CurPosition.row, CurPosition.col + 1});
+
+      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+          SquareType::Treasure) {
+        turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
+      }
       board_->SetSquareValue({CurPosition.row, CurPosition.col + 1},
                              SquareType::Human);
       board_->SetSquareValue(CurPosition, SquareType::Empty);
@@ -335,6 +348,7 @@ void Maze::TakeTurn() {
     /*
      * The enemies sometime make seemingly impossible moves.  I swear its not
      * a bug, but a feature.  Spooky!
+     * Also enemies eat treasure, which is intended behavior
      */
     board_->SetSquareValue(turnOrder_.back()->get_position(), SquareType::Empty);
     turnOrder_.back()->SetPosition(result.at(random));
@@ -349,6 +363,10 @@ bool Maze::IsGameOver() {
   Position end = {BOARDDIM-1, BOARDDIM-1};
   bool isDead = false;
 
+  /*
+   * This makes the assumption that there is only one player, and in that case
+   * it will always be at players_.at(0), so compare its position with the rest
+   */
   for (unsigned int i = 1; i < players_.size(); i++) {
     if (players_.at(0)->get_position() == players_.at(i)->get_position()) {
       std::cout << "\nYou died!\n";
