@@ -1,5 +1,6 @@
 #include "Maze.h"
 #include <assert.h>
+#include <algorithm>
 #include <iostream>
 
 Generator::Generator() {
@@ -238,6 +239,7 @@ void Maze::NewGame(Player *human, const int enemies) {
 
 void Maze::TakeTurn() {
   Player * Current = turnOrder_.front();
+  Position move;
   std::vector<Position> result;
 
   //move the player taking their turn to the back of the turn queue
@@ -245,14 +247,72 @@ void Maze::TakeTurn() {
   turnOrder_.push(Current);
 
   if(Current->is_human()) {
+    int count = 0;
+    bool continueLooping = true;
+    std::string input;
+    std::vector<std::string> validMoves;
     result = board_->GetMoves(Current);
 
     std::cout << "Valid Moves are: ( ";
     for(Position i : result) {
+      count += 1;
       //std::cout << "i: { " << i.row << ", " << i.col << "} ";
+      validMoves.push_back(Current->ToRelativePosition(i));
+
       std::cout << Current->ToRelativePosition(i) << " ";
     }
-    std::cout << ")\n";
+    std::cout << ")\nCount = " << count;
 
+    count = 0;
+    /*
+     * If the input from the user (case insensitive) matches a move in the
+     * vector of strings validMoves, then stop looping, and move the player to
+     * that position
+     */
+    while(continueLooping) {
+      std::cout << "Enter valid direction: ";
+      std::cin >> input;
+
+      std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+      for(std::string j : validMoves) {
+        count += 1;
+        if(input == j) {
+          continueLooping = false;
+        }
+      }
+    }
+
+    Position CurPosition = {
+      Current->get_position().row,
+      Current->get_position().col
+    };
+
+    if (input == "UP") {
+      turnOrder_.back()->SetPosition({CurPosition.row - 1, CurPosition.col});
+      board_->SetSquareValue({CurPosition.row - 1, CurPosition.col},
+                             SquareType::Human);
+      board_->SetSquareValue(CurPosition, SquareType::Empty);
+    }
+    if (input == "DOWN") {
+      turnOrder_.back()->SetPosition({CurPosition.row + 1, CurPosition.col});
+      board_->SetSquareValue({CurPosition.row + 1, CurPosition.col},
+                             SquareType::Human);
+      board_->SetSquareValue(CurPosition, SquareType::Empty);
+    }
+    if (input == "LEFT") {
+      turnOrder_.back()->SetPosition({CurPosition.row, CurPosition.col - 1});
+      board_->SetSquareValue({CurPosition.row, CurPosition.col - 1},
+                             SquareType::Human);
+      board_->SetSquareValue(CurPosition, SquareType::Empty);
+    }
+    if (input == "RIGHT") {
+      turnOrder_.back()->SetPosition({CurPosition.row, CurPosition.col + 1});
+      board_->SetSquareValue({CurPosition.row, CurPosition.col + 1},
+                             SquareType::Human);
+      board_->SetSquareValue(CurPosition, SquareType::Empty);
+    }
+
+    std::cout << "Current Pos: {" << Current->get_position().row << ", "
+              << turnOrder_.back()->get_position().col << "}\n";
   }
 }

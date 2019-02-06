@@ -52,5 +52,7 @@ int main() {
 
   a.TakeTurn();
 
+  std::cout << a;
+
   return 0;
 }
