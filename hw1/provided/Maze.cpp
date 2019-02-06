@@ -211,6 +211,7 @@ void Maze::PrintMaze() {
 void Maze::NewGame(Player *human, const int enemies) {
   std::string name = "Monster_";
   turnOrder_.push(human);
+  players_.push_back(human);
 
   for(int x = 0; x < enemies; x++) {
     int row = 0;
@@ -235,6 +236,7 @@ void Maze::NewGame(Player *human, const int enemies) {
     board_->SetSquareValue({row, col}, SquareType::Enemy);
 
     turnOrder_.push(mon);
+    players_.push_back(mon);
   }
 }
 
@@ -288,6 +290,12 @@ void Maze::TakeTurn() {
       Current->get_position().col
     };
 
+    if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+        SquareType::Treasure) {
+      turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
+    }
+
+
     if (input == "UP") {
       turnOrder_.back()->SetPosition({CurPosition.row - 1, CurPosition.col});
       board_->SetSquareValue({CurPosition.row - 1, CurPosition.col},
@@ -313,10 +321,13 @@ void Maze::TakeTurn() {
       board_->SetSquareValue(CurPosition, SquareType::Empty);
     }
 
-    std::cout << "Current Pos: {" << Current->get_position().row << ", "
-              << turnOrder_.back()->get_position().col << "}\n";
+    std::cout << "Current Pos: {" << turnOrder_.back()->get_position().row
+              << ", " << turnOrder_.back()->get_position().col << "}\n";
+
 
     turn_count_ += 1;
+  } else {
+    //non-humans turn
   }
 }
 
@@ -325,5 +336,16 @@ bool Maze::IsGameOver() {
    * The game is over if the player's position is the same as the exit position
    */
   Position end = {BOARDDIM-1, BOARDDIM-1};
-  return(turnOrder_.back()->get_position() == end);
+  bool isDead = false;
+
+  for (unsigned int i = 1; i < players_.size(); i++) {
+    if (players_.at(0)->get_position() == players_.at(i)->get_position()) {
+      std::cout << "\nYou died!\n";
+      isDead = true;
+    }
+  }
+
+  return ((turnOrder_.back()->is_human() &&
+           turnOrder_.back()->get_position() == end) ||
+          isDead);
 }
