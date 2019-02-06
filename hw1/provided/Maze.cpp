@@ -161,6 +161,7 @@ SquareType Board::GetExitOccupant() {
 
 Maze::Maze() {
   int random = 0;
+  turn_count_ = 0;
   board_ = new Board;
 
   /*
@@ -314,5 +315,14 @@ void Maze::TakeTurn() {
 
     std::cout << "Current Pos: {" << Current->get_position().row << ", "
               << turnOrder_.back()->get_position().col << "}\n";
+
+    turn_count_ += 1;
   }
+}
+
+bool Maze::IsGameOver() {
+  /*
+   * The game is over if the player's position is the same as the exit position
+   */
+  return(board_->get_square_value(turnOrder_.back()->get_position()) == SquareType::Exit);
 }
