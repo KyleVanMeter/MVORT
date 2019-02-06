@@ -52,8 +52,8 @@ int main() {
 
   while(!a.IsGameOver()) {
     a.TakeTurn();
-    std::cout << a;
 
+    std::cout << a;
   }
 
   return 0;

@@ -51,6 +51,7 @@ std::string SquareTypeStringify(SquareType sq) {
     ".",
     "◯",
     "▣",
+    " ",
     result
   };
 
@@ -167,27 +168,53 @@ Maze::Maze() {
   /*
    * We are starting at [0][1] as [0][0] will always be SquareType::Human, also
    * walls are a 20% chance on each square so we just pick a random number
-   * between 0, and 4 (1 in 5 chance), and 0 and 9 (1 in 10) for treasure
+   * between 0 and 4 (1 in 5 chance), 0 and 9 (1 in 10) for treasure, and 0 and
+   * 19 (1 in 20 chance) for a pit hazard
    */
 
   for(int i = 0; i < BOARDDIM; i++) {
     for(int j = 1; j < BOARDDIM; j++) {
-      random = Generator::GetInstance().GetRandomInt(0, 9);
+      random = Generator::GetInstance().GetRandomInt(0, 4);
 
-      if(random == 4) {
+      if (random == 4) {
         board_->SetSquareValue({i,j}, SquareType::Wall);
+        random = Generator::GetInstance().GetRandomInt(0, 1);
+      } else if (random == 1) {
+        board_->SetSquareValue({i,j}, SquareType::Pit);
       } else {
         board_->SetSquareValue({i,j}, SquareType::Empty);
       }
     }
   }
 
-  for(int i = 0; i < BOARDDIM; i++) {
-    for(int j = 1; j < BOARDDIM; j++) {
+  /*
+   * If the exit is entirely blocked, we must ensure that there is a valid path
+   * This is not any fancy path-finding algorithm, but will deal the most
+   * probable event (that the immediate up, and left spaces are walls/pits)
+   */
+  if ((board_->get_square_value({BOARDDIM - 2, BOARDDIM - 1}) ==
+       SquareType::Wall &&
+       board_->get_square_value({BOARDDIM - 1, BOARDDIM - 2}) ==
+       SquareType::Wall) ||
+      (board_->get_square_value({BOARDDIM - 2, BOARDDIM - 1}) ==
+       SquareType::Pit &&
+       board_->get_square_value({BOARDDIM - 1, BOARDDIM - 2}) ==
+       SquareType::Pit)) {
+    for (int i = 0; i < BOARDDIM - 1; i++) {
+      board_->SetSquareValue({BOARDDIM - 1, i}, SquareType::Empty);
+    }
+
+    for (int j = 1; j < BOARDDIM - 1; j++) {
+      board_->SetSquareValue({j, 0}, SquareType::Empty);
+    }
+  }
+
+  for (int i = 0; i < BOARDDIM; i++) {
+    for (int j = 1; j < BOARDDIM; j++) {
       random = Generator::GetInstance().GetRandomInt(0, 9);
 
-      if(random == 9 &&
-         board_->get_square_value({i, j}) != SquareType::Wall) {
+      if (random == 9 &&
+          board_->get_square_value({i, j}) != SquareType::Wall) {
         board_->SetSquareValue({i, j}, SquareType::Treasure);
       }
     }
@@ -296,9 +323,17 @@ void Maze::TakeTurn() {
           SquareType::Treasure) {
         turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
       }
-      board_->SetSquareValue({CurPosition.row - 1, CurPosition.col},
-                             SquareType::Human);
-      board_->SetSquareValue(CurPosition, SquareType::Empty);
+      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+          SquareType::Pit) {
+        std::cout << "\nYou fell!  Start over.\n";
+        turnOrder_.back()->SetPosition({0, 0});
+        board_->SetSquareValue({0,0}, SquareType::Human);
+        board_->SetSquareValue(CurPosition, SquareType::Empty);
+      } else {
+        board_->SetSquareValue({CurPosition.row - 1, CurPosition.col},
+                               SquareType::Human);
+        board_->SetSquareValue(CurPosition, SquareType::Empty);
+      }
     }
     if (input == "DOWN") {
       turnOrder_.back()->SetPosition({CurPosition.row + 1, CurPosition.col});
@@ -307,9 +342,17 @@ void Maze::TakeTurn() {
           SquareType::Treasure) {
         turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
       }
-      board_->SetSquareValue({CurPosition.row + 1, CurPosition.col},
-                             SquareType::Human);
-      board_->SetSquareValue(CurPosition, SquareType::Empty);
+      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+          SquareType::Pit) {
+        std::cout << "\nYou fell!  Start over.\n";
+        turnOrder_.back()->SetPosition({0,0});
+        board_->SetSquareValue({0, 0}, SquareType::Human);
+        board_->SetSquareValue(CurPosition, SquareType::Empty);
+      } else {
+        board_->SetSquareValue({CurPosition.row + 1, CurPosition.col},
+                               SquareType::Human);
+        board_->SetSquareValue(CurPosition, SquareType::Empty);
+      }
     }
     if (input == "LEFT") {
       turnOrder_.back()->SetPosition({CurPosition.row, CurPosition.col - 1});
@@ -318,9 +361,17 @@ void Maze::TakeTurn() {
           SquareType::Treasure) {
         turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
       }
-      board_->SetSquareValue({CurPosition.row, CurPosition.col - 1},
-                             SquareType::Human);
-      board_->SetSquareValue(CurPosition, SquareType::Empty);
+      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+          SquareType::Pit) {
+        std::cout << "\nYou fell!  Start over.\n";
+        turnOrder_.back()->SetPosition({0, 0});
+        board_->SetSquareValue({0, 0}, SquareType::Human);
+        board_->SetSquareValue(CurPosition, SquareType::Empty);
+      } else {
+        board_->SetSquareValue({CurPosition.row, CurPosition.col - 1},
+                               SquareType::Human);
+        board_->SetSquareValue(CurPosition, SquareType::Empty);
+      }
     }
     if (input == "RIGHT") {
       turnOrder_.back()->SetPosition({CurPosition.row, CurPosition.col + 1});
@@ -329,9 +380,17 @@ void Maze::TakeTurn() {
           SquareType::Treasure) {
         turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
       }
-      board_->SetSquareValue({CurPosition.row, CurPosition.col + 1},
-                             SquareType::Human);
-      board_->SetSquareValue(CurPosition, SquareType::Empty);
+      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+          SquareType::Pit) {
+        std::cout << "\nYou fell!  Start over.\n";
+        turnOrder_.back()->SetPosition({0, 0});
+        board_->SetSquareValue({0, 0}, SquareType::Human);
+        board_->SetSquareValue(CurPosition, SquareType::Empty);
+      } else {
+        board_->SetSquareValue({CurPosition.row, CurPosition.col + 1},
+                               SquareType::Human);
+        board_->SetSquareValue(CurPosition, SquareType::Empty);
+      }
     }
 
     std::cout << "Current Pos: {" << turnOrder_.back()->get_position().row

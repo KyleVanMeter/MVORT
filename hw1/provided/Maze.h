@@ -10,7 +10,7 @@
 #include <random>
 #include "Player.h"
 
-enum class SquareType { Wall, Exit, Empty, Human, Enemy, Treasure, MAX };
+enum class SquareType { Wall, Exit, Empty, Human, Enemy, Pit, Treasure, MAX };
 
 std::string SquareTypeStringify(SquareType sq);
 
@@ -113,11 +113,13 @@ public:
    * to ostream for anything in the statement after the Maze object
    */
 	friend std::ostream& operator<<(std::ostream& os, const Maze &m) {
-    for(int i = 0; i < BOARDDIM; i++) {
-      for(int j = 0; j < BOARDDIM; j++) {
-        os << SquareTypeStringify(m.board_->get_square_value({i,j}));
+    if (m.turnOrder_.front()->is_human()) {
+      for (int i = 0; i < BOARDDIM; i++) {
+        for (int j = 0; j < BOARDDIM; j++) {
+          os << SquareTypeStringify(m.board_->get_square_value({i, j}));
+        }
+        os << "\n";
       }
-      os << "\n";
     }
 
     std::queue<Player *> cpy = m.turnOrder_;
