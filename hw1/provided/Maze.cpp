@@ -324,5 +324,6 @@ bool Maze::IsGameOver() {
   /*
    * The game is over if the player's position is the same as the exit position
    */
-  return(board_->get_square_value(turnOrder_.back()->get_position()) == SquareType::Exit);
+  Position end = {BOARDDIM-1, BOARDDIM-1};
+  return(turnOrder_.back()->get_position() == end);
 }

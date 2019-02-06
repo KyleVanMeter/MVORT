@@ -50,9 +50,11 @@ int main() {
 
   std::cout << a;
 
-  a.TakeTurn();
+  while(!a.IsGameOver()) {
+    a.TakeTurn();
 
-  std::cout << a;
+    std::cout << a;
+  }
 
   return 0;
 }
