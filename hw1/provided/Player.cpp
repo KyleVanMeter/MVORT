@@ -21,7 +21,7 @@ void Player::SetPosition(Position pos) {
 std::string Player::ToRelativePosition(Position other) {
   //this is assuming that Position other is restricted to adjacent points
 
-  std::cout << "internal: {" + std::to_string(pos_.row) + ", " + std::to_string(pos_.col) + "}, and {" + std::to_string(other.row) + ", " + std::to_string(other.col) + "}\n";
+  //std::cout << "internal: {" + std::to_string(pos_.row) + ", " + std::to_string(pos_.col) + "}, and {" + std::to_string(other.row) + ", " + std::to_string(other.col) + "}\n";
 
   std::string result;
   if(pos_.row == other.row && pos_.col-1 == other.col) {

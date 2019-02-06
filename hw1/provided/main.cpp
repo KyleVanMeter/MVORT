@@ -3,6 +3,7 @@
 
 int main() {
   Player p1 = Player("test", true);
+  /*
   p1.ChangePoints(10);
   std::cout << "Testing Player object\np1.get_name() = " + p1.get_name()
     + "\np1.get_points = " + std::to_string(p1.get_points())
@@ -25,8 +26,11 @@ int main() {
 
   std::cout << "Testing random class singleton: " << test0 <<" " << test1
             << "\nTesting board initialization: \n\n";
+  */
 
   Board b;
+
+  std::cout << "rows: " << b.get_rows() << ", cols: " << b.get_cols() << "\n";
 
   for(int i = 0; i < BOARDDIM; i++) {
     for(int j = 0; j < BOARDDIM; j++) {
@@ -41,11 +45,12 @@ int main() {
   std::cout << "a.print():\n";
   a.PrintMaze();
 
-  std::cout << "Creating test game with Player p1...\n";
+  std::cout << "Creating test game with Player p1, and 2 enemies...\n";
   a.NewGame(&p1, 2);
-  a.PrintMaze();
 
   std::cout << a;
+
+  a.TakeTurn();
 
   return 0;
 }

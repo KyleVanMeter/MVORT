@@ -91,31 +91,49 @@ std::vector<Position> Board::GetMoves(Player *p) {
   std::vector<Position> moves;
 
   Position copy = p->get_position();
+  //std::cout << "\n p at: {" << copy.row << ", " << copy.col << "}\n";
 
-  bool isUValid = !(get_square_value({copy.row--, copy.col}) == SquareType::Wall
-                   || copy.row-- < 0);
-  bool isDValid = !(get_square_value({copy.row++, copy.col}) == SquareType::Wall
-                   || copy.row++ > BOARDDIM);
-  bool isRValid = !(get_square_value({copy.row, copy.col++}) == SquareType::Wall
-                   || copy.col++ > BOARDDIM);
-  bool isLValid = !(get_square_value({copy.row, copy.col--}) == SquareType::Wall
-                    || copy.col-- < 0);
+  bool isUValid = !(get_square_value({copy.row-1, copy.col}) == SquareType::Wall
+                   || (copy.row-1) < 0);
+  bool isDValid = !(get_square_value({copy.row+1, copy.col}) == SquareType::Wall
+                   || (copy.row+1 > BOARDDIM));
+  bool isRValid = !(get_square_value({copy.row, copy.col+1}) == SquareType::Wall
+                   || (copy.col+1 > BOARDDIM));
+  bool isLValid = !(get_square_value({copy.row, copy.col-1}) == SquareType::Wall
+                   || (copy.col-1 < 0));
+
+  //std::cout << "copy is now: " << copy.row << ", " << copy.col << "\n";
 
   if(isUValid) {
-    moves.push_back({copy.row--, copy.col});
+    //std::cout << "UP is valid. Pushing: " << copy.row-1 << ", " << copy.col
+    //         << "\n";
+    moves.push_back({copy.row-1, copy.col});
   }
 
   if(isDValid) {
-    moves.push_back({copy.row++, copy.col});
+    //std::cout << "DOWN is valid. Pushing: " << copy.row+1 << ", " << copy.col
+    //          << "\n";
+    moves.push_back({copy.row+1, copy.col});
   }
 
   if(isRValid) {
-    moves.push_back({copy.row, copy.col++});
+    //std::cout << "RIGHT is valid.  Pushing: " << copy.row << ", " << copy.col+1
+    //          << "\n";
+    moves.push_back({copy.row, copy.col+1});
   }
 
   if(isLValid) {
-    moves.push_back({copy.row, copy.col--});
+    //std::cout << "LEFT is valid. Pushing: " << copy.row << ", " << copy.col-1
+    //          << "\n";
+    moves.push_back({copy.row, copy.col-1});
   }
+
+  //std::cout << "returning: {";
+  //for(auto i : moves) {
+  //  std::cout << " [" << i.row << ", " << i.col << "],";
+  //}
+  //
+  //std::cout << "}";
 
   return moves;
 }
@@ -215,5 +233,26 @@ void Maze::NewGame(Player *human, const int enemies) {
     board_->SetSquareValue({row, col}, SquareType::Enemy);
 
     turnOrder_.push(mon);
+  }
+}
+
+void Maze::TakeTurn() {
+  Player * Current = turnOrder_.front();
+  std::vector<Position> result;
+
+  //move the player taking their turn to the back of the turn queue
+  turnOrder_.pop();
+  turnOrder_.push(Current);
+
+  if(Current->is_human()) {
+    result = board_->GetMoves(Current);
+
+    std::cout << "Valid Moves are: ( ";
+    for(Position i : result) {
+      //std::cout << "i: { " << i.row << ", " << i.col << "} ";
+      std::cout << Current->ToRelativePosition(i) << " ";
+    }
+    std::cout << ")\n";
+
   }
 }

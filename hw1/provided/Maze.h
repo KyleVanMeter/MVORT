@@ -1,7 +1,9 @@
 #ifndef _MAZE_H_
 #define _MAZE_H_
 
-#define BOARDDIM 4
+//Make sure you run make clean before recompiling after changing this number
+#define BOARDDIM 8
+
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -86,8 +88,8 @@ public:
 	// a number of enemies to generate
 	void NewGame(Player *human, const int enemies);
 
-	// have the given Player take their turn
-	void TakeTurn(Player *p);
+	// have the Player at the front of the queue take their turn
+	void TakeTurn();
 
 	// Get the next player in turn order
 	Player * GetNextPlayer();
