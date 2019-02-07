@@ -15,8 +15,13 @@ enum class SquareType { Wall, Exit, Empty, Human, Enemy, Pit, Treasure, MAX };
 std::string SquareTypeStringify(SquareType sq);
 
 /*
- * Why is this a singleton?  There are several cases where we need to get a random number across different classes.  Instantiating the random number generator needed, and seeding it is expensive to do repeatedly.  So this is an attempt to create only one generator, and have it be used by all other classes.
- * Of course if we were doing something over a longer period, like simulating Brownian motion, we would have to be careful about correlation from a single generator.  In our case we should be fine.
+ * Why is this a singleton?  There are several cases where we need to get a
+ * random number across different classes.  Instantiating the random number
+ * generator needed, and seeding it is expensive to do repeatedly.  So this is
+ * an attempt to create only one generator, and have it be used by all other
+ * classes. Of course if we were doing something over a longer period, like
+ * simulating Brownian motion, we would have to be careful about correlation
+ * from a single generator.  In our case we should be fine.
  */
 class Generator {
  public:
@@ -61,8 +66,8 @@ class Board {
 
   // You probably want to implement this
   friend std::ostream& operator<<(std::ostream& os, const Board &b) {
-    for(int i = 0; i < BOARDDIM; i++) {
-      for(int j = 0; j < BOARDDIM; j++) {
+    for (int i = 0; i < BOARDDIM; i++) {
+      for (int j = 0; j < BOARDDIM; j++) {
         os << SquareTypeStringify(b.arr_[i][j]);
       }
       os << "\n";
@@ -75,7 +80,6 @@ class Board {
 	int rows_; // might be convenient but not necessary
 	int cols_;
 
-	// you may add more fields, as needed
 };  // class Board
 
 class Maze {
@@ -142,7 +146,6 @@ private:
 	int turn_count_;
 
   std::queue<Player *> turnOrder_;
-	// you may add more fields, as needed
 
 };  // class Maze
 

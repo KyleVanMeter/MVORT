@@ -171,15 +171,14 @@ Maze::Maze() {
    * between 0 and 4 (1 in 5 chance), 0 and 9 (1 in 10) for treasure, and 0 and
    * 19 (1 in 20 chance) for a pit hazard
    */
-
   for(int i = 0; i < BOARDDIM; i++) {
     for(int j = 1; j < BOARDDIM; j++) {
       random = Generator::GetInstance().GetRandomInt(0, 4);
 
       if (random == 4) {
         board_->SetSquareValue({i,j}, SquareType::Wall);
-        random = Generator::GetInstance().GetRandomInt(0, 1);
-      } else if (random == 1) {
+        random = Generator::GetInstance().GetRandomInt(0, 10);
+      } else if (random == 2) {
         board_->SetSquareValue({i,j}, SquareType::Pit);
       } else {
         board_->SetSquareValue({i,j}, SquareType::Empty);
@@ -200,6 +199,10 @@ Maze::Maze() {
        SquareType::Pit &&
        board_->get_square_value({BOARDDIM - 1, BOARDDIM - 2}) ==
        SquareType::Pit)) {
+
+    /*
+     * If this is the case then we clear a route along the edge
+     */
     for (int i = 0; i < BOARDDIM - 1; i++) {
       board_->SetSquareValue({BOARDDIM - 1, i}, SquareType::Empty);
     }
@@ -209,6 +212,10 @@ Maze::Maze() {
     }
   }
 
+  /*
+   * We are re-iterating over the board to generate treasure in the hopes that
+   * this will help avoid any correlation between walls, and treasure
+   */
   for (int i = 0; i < BOARDDIM; i++) {
     for (int j = 1; j < BOARDDIM; j++) {
       random = Generator::GetInstance().GetRandomInt(0, 9);
@@ -269,7 +276,6 @@ void Maze::NewGame(Player *human, const int enemies) {
 
 void Maze::TakeTurn() {
   Player * Current = turnOrder_.front();
-  Position move;
   std::vector<Position> result;
 
   //move the player taking their turn to the back of the turn queue
@@ -285,7 +291,6 @@ void Maze::TakeTurn() {
 
     std::cout << "Valid Moves are: ( ";
     for(Position i : result) {
-      //std::cout << "i: { " << i.row << ", " << i.col << "} ";
       validMoves.push_back(Current->ToRelativePosition(i));
 
       std::cout << Current->ToRelativePosition(i) << " ";
@@ -301,7 +306,9 @@ void Maze::TakeTurn() {
       std::cout << "Enter valid direction: ";
       std::cin >> input;
 
+      //dumb c++ way of upper-casing a string
       std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+
       for(std::string j : validMoves) {
         if(input == j) {
           continueLooping = false;
@@ -315,7 +322,12 @@ void Maze::TakeTurn() {
       Current->get_position().col
     };
 
-
+    /*
+     * This block of solid text (garbage) simply moves the player in the
+     * direction given via their input, ensures that the board is draw
+     * correctly, and deals with dying, picking up treasure, or falling into a
+     * pit.  There must be a better way of doing this...
+     */
     if (input == "UP") {
       Current->SetPosition({CurPosition.row - 1, CurPosition.col});
 
@@ -326,6 +338,7 @@ void Maze::TakeTurn() {
       if (board_->get_square_value(Current->get_position()) ==
           SquareType::Pit) {
         std::cout << "\nYou fell!  Start over.\n";
+        Current->ChangePoints(Current->get_points() - 50);
         Current->SetPosition({0, 0});
         board_->SetSquareValue({0,0}, SquareType::Human);
         board_->SetSquareValue(CurPosition, SquareType::Empty);
@@ -345,6 +358,7 @@ void Maze::TakeTurn() {
       if (board_->get_square_value(Current->get_position()) ==
           SquareType::Pit) {
         std::cout << "\nYou fell!  Start over.\n";
+        Current->ChangePoints(Current->get_points() - 50);
         Current->SetPosition({0, 0});
         board_->SetSquareValue({0, 0}, SquareType::Human);
         board_->SetSquareValue(CurPosition, SquareType::Empty);
@@ -364,6 +378,7 @@ void Maze::TakeTurn() {
       if (board_->get_square_value(Current->get_position()) ==
           SquareType::Pit) {
         std::cout << "\nYou fell!  Start over.\n";
+        Current->ChangePoints(Current->get_points() - 50);
         Current->SetPosition({0, 0});
         board_->SetSquareValue({0, 0}, SquareType::Human);
         board_->SetSquareValue(CurPosition, SquareType::Empty);
@@ -383,6 +398,7 @@ void Maze::TakeTurn() {
       if (board_->get_square_value(Current->get_position()) ==
           SquareType::Pit) {
         std::cout << "\nYou fell!  Start over.\n";
+        Current->ChangePoints(Current->get_points() - 50);
         Current->SetPosition({0, 0});
         board_->SetSquareValue({0, 0}, SquareType::Human);
         board_->SetSquareValue(CurPosition, SquareType::Empty);
@@ -413,8 +429,8 @@ void Maze::TakeTurn() {
 
     /*
      * The enemies sometime make seemingly impossible moves.  I swear its not
-     * a bug, but a feature.  Spooky!
-     * Also enemies eat treasure, which is intended behavior
+     * a bug, but a feature.  Spooky!  Also enemies eat treasure, and will
+     * occasionally fill in pits (how kind), which is intended behavior
      */
     board_->SetSquareValue(turnOrder_.back()->get_position(), SquareType::Empty);
     turnOrder_.back()->SetPosition(result.at(random));
@@ -424,7 +440,8 @@ void Maze::TakeTurn() {
 
 bool Maze::IsGameOver() {
   /*
-   * The game is over if the player's position is the same as the exit position
+   * The game is over if the player's position is the same as the exit position,
+   * or the player and an enemy share the same position
    */
   Position end = {BOARDDIM-1, BOARDDIM-1};
   bool isDead = false;
@@ -436,6 +453,7 @@ bool Maze::IsGameOver() {
   for (unsigned int i = 1; i < players_.size(); i++) {
     if (players_.at(0)->get_position() == players_.at(i)->get_position()) {
       std::cout << "\nYou died!\n";
+      players_.at(0)->ChangePoints(players_.at(0)->get_points() - 100);
       isDead = true;
     }
   }
