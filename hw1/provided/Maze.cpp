@@ -317,16 +317,16 @@ void Maze::TakeTurn() {
 
 
     if (input == "UP") {
-      turnOrder_.back()->SetPosition({CurPosition.row - 1, CurPosition.col});
+      Current->SetPosition({CurPosition.row - 1, CurPosition.col});
 
-      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+      if (board_->get_square_value(Current->get_position()) ==
           SquareType::Treasure) {
-        turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
+        Current->ChangePoints(Current->get_points() + 100);
       }
-      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+      if (board_->get_square_value(Current->get_position()) ==
           SquareType::Pit) {
         std::cout << "\nYou fell!  Start over.\n";
-        turnOrder_.back()->SetPosition({0, 0});
+        Current->SetPosition({0, 0});
         board_->SetSquareValue({0,0}, SquareType::Human);
         board_->SetSquareValue(CurPosition, SquareType::Empty);
       } else {
@@ -336,16 +336,16 @@ void Maze::TakeTurn() {
       }
     }
     if (input == "DOWN") {
-      turnOrder_.back()->SetPosition({CurPosition.row + 1, CurPosition.col});
+      Current->SetPosition({CurPosition.row + 1, CurPosition.col});
 
-      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+      if (board_->get_square_value(Current->get_position()) ==
           SquareType::Treasure) {
-        turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
+        Current->ChangePoints(Current->get_points() + 100);
       }
-      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+      if (board_->get_square_value(Current->get_position()) ==
           SquareType::Pit) {
         std::cout << "\nYou fell!  Start over.\n";
-        turnOrder_.back()->SetPosition({0,0});
+        Current->SetPosition({0,0});
         board_->SetSquareValue({0, 0}, SquareType::Human);
         board_->SetSquareValue(CurPosition, SquareType::Empty);
       } else {
@@ -355,16 +355,16 @@ void Maze::TakeTurn() {
       }
     }
     if (input == "LEFT") {
-      turnOrder_.back()->SetPosition({CurPosition.row, CurPosition.col - 1});
+      Current->SetPosition({CurPosition.row, CurPosition.col - 1});
 
-      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+      if (board_->get_square_value(Current->get_position()) ==
           SquareType::Treasure) {
-        turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
+        Current->ChangePoints(Current->get_points() + 100);
       }
-      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+      if (board_->get_square_value(Current->get_position()) ==
           SquareType::Pit) {
         std::cout << "\nYou fell!  Start over.\n";
-        turnOrder_.back()->SetPosition({0, 0});
+        Current->SetPosition({0, 0});
         board_->SetSquareValue({0, 0}, SquareType::Human);
         board_->SetSquareValue(CurPosition, SquareType::Empty);
       } else {
@@ -374,16 +374,16 @@ void Maze::TakeTurn() {
       }
     }
     if (input == "RIGHT") {
-      turnOrder_.back()->SetPosition({CurPosition.row, CurPosition.col + 1});
+      Current->SetPosition({CurPosition.row, CurPosition.col + 1});
 
-      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+      if (board_->get_square_value(Current->get_position()) ==
           SquareType::Treasure) {
-        turnOrder_.back()->ChangePoints(turnOrder_.back()->get_points() + 100);
+        Current->ChangePoints(Current->get_points() + 100);
       }
-      if (board_->get_square_value(turnOrder_.back()->get_position()) ==
+      if (board_->get_square_value(Current->get_position()) ==
           SquareType::Pit) {
         std::cout << "\nYou fell!  Start over.\n";
-        turnOrder_.back()->SetPosition({0, 0});
+        Current->SetPosition({0, 0});
         board_->SetSquareValue({0, 0}, SquareType::Human);
         board_->SetSquareValue(CurPosition, SquareType::Empty);
       } else {
@@ -393,8 +393,8 @@ void Maze::TakeTurn() {
       }
     }
 
-    std::cout << "Current Pos: {" << turnOrder_.back()->get_position().row
-              << ", " << turnOrder_.back()->get_position().col << "}\n";
+    std::cout << "Current Pos: {" << Current->get_position().row
+              << ", " << Current->get_position().col << "}\n";
 
 
     turn_count_ += 1;
