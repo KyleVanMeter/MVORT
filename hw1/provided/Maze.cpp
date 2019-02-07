@@ -345,7 +345,7 @@ void Maze::TakeTurn() {
       if (board_->get_square_value(Current->get_position()) ==
           SquareType::Pit) {
         std::cout << "\nYou fell!  Start over.\n";
-        Current->SetPosition({0,0});
+        Current->SetPosition({0, 0});
         board_->SetSquareValue({0, 0}, SquareType::Human);
         board_->SetSquareValue(CurPosition, SquareType::Empty);
       } else {
@@ -400,9 +400,16 @@ void Maze::TakeTurn() {
     turn_count_ += 1;
   } else {
     //non-humans turn
+    int random = 0;
     result = board_->GetMoves(Current);
-
-    int random = Generator::GetInstance().GetRandomInt(0, result.size()-1);
+    /*
+     * we must ensure that min < max when calling GetRandomInt so we must deal
+     * the case where there are no valid moves (move to the same space), or
+     * only one valid move (do that move)
+    */
+    if (result.size() > 1) {
+      random = Generator::GetInstance().GetRandomInt(0, result.size() - 1);
+    }
 
     /*
      * The enemies sometime make seemingly impossible moves.  I swear its not
