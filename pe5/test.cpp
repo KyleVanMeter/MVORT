@@ -3,10 +3,13 @@
 
 #include "Rectangle.h"
 
+TEST_CASE("Constructor is computed", "[Rectangle]") {
+  Rectangle a({0, 0}, {1, 1});
+  REQUIRE(a.get_p1().x == 0);
+  REQUIRE(a.get_p1().y == 0);
+  REQUIRE(a.get_p2().x == 1);
+  REQUIRE(a.get_p2().y == 1);
 
-TEST_CASE ( "Factorials are computed", "[factorial]") {
-  REQUIRE( Factorial(2) == 2 );
-  REQUIRE( Factorial(3) == 6 );
 }
 
 TEST_CASE("Width is computed", "[GetWidth]") {
@@ -169,7 +172,7 @@ TEST_CASE("Shrink is calculated", "[Shrink()]") {
 
   Rectangle b({-2, 1}, {1, 2});
   b.Shrink();
-  bool IsBTrue = (b.get_p1().x == -1 && b.get_p1().y == 0) &&
+  bool IsBTrue = (b.get_p1().x == -1 && b.get_p1().y == 2) &&
                  (b.get_p2().x == 0 && b.get_p2().y == 1);
   REQUIRE(IsBTrue);
 
