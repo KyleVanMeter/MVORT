@@ -5,12 +5,13 @@
 
 class Sphere : public Hitable {
  public:
-   Sphere() {}
-   Sphere(Vec3 cen, float r) : center(cen), radius(r){};
-   virtual bool hit(const Ray &r, float tmin, float tmax,
-                    Hit_Record &rec) const;
-   Vec3 center;
-   float radius;
+  Sphere() {}
+ Sphere(Vec3 cen, float r, Material *a) : center(cen), radius(r), mat_ptr(a){};
+  virtual bool hit(const Ray &r, float tmin, float tmax,
+                   Hit_Record &rec) const;
+  Vec3 center;
+  float radius;
+  Material *mat_ptr;
 };
 
 bool Sphere::hit(const Ray& r, float t_min, float t_max, Hit_Record& rec) const {
@@ -21,20 +22,22 @@ bool Sphere::hit(const Ray& r, float t_min, float t_max, Hit_Record& rec) const 
 
   float discriminant = b*b - a*c;
   if(discriminant > 0) {
-    float temp = (-b - sqrt(b*b - a*c))/a;
+    float temp = (-b - sqrt(discriminant))/a;
     if(temp < t_max && temp > t_min) {
       rec.t = temp;
       rec.p = r.point_at_parameter(rec.t);
       rec.normal = (rec.p - center) / radius;
+      rec.mat_ptr = mat_ptr;
 
       return true;
     }
 
-    temp = (-b + sqrt(b*b - a*c))/a;
+    temp = (-b + sqrt(discriminant))/a;
     if(temp < t_max && temp > t_min) {
       rec.t = temp;
       rec.p = r.point_at_parameter(rec.t);
       rec.normal = (rec.p - center) / radius;
+      rec.mat_ptr = mat_ptr;
 
       return true;
     }
