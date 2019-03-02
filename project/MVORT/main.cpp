@@ -43,7 +43,12 @@ int main() {
   list[4] =
       new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectic(1.5));
   Hitable *world = new Hitable_List(list, 5);
-  Camera cam(Vec3(-2, 2, 1), Vec3(0, 0, 1), Vec3(0, 1, 0), 60, float(nx)/float(ny));
+
+  Vec3 lookat(0, 0, -1);
+  Vec3 lookfrom(3, 3, 2);
+  float dist_to_focus = (lookfrom - lookat).length();
+  float aperature = 2.0;
+  Camera cam(lookfrom, lookat, Vec3(0,1,0), 20, float(nx)/float(ny), aperature, dist_to_focus);
 
   for(int j = ny-1; j >= 0; j--) {
     for(int i = 0; i < nx; i++) {
