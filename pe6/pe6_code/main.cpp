@@ -3,7 +3,7 @@
 
 #include "Society.h"
 
-// Name:
+// Name: Kyle Van Meter
 
 
 // Edit any of Society.h, Society.cpp and this file in your refactoring

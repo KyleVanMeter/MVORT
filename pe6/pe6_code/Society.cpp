@@ -7,41 +7,38 @@
 bool City::IsBig() const {
     if (population_ > 100000) {
         return true;
-    } else if (population_ <= 100000) {
-        return false;
     }
+
     return false;
 }
 
 void City::Grow(int const num_people) {
-    if (num_people >= 0 == true) {
+    if (num_people >= 0) {
         int prev = population_;
         population_ += num_people;
-        percent_change_ = (1.0 * num_people) / prev;
+        percent_change_ = (num_people) / prev;
     }
 }
 
 void City::Shrink(int const num_people) {
-    if (num_people >= 0 == true) {
+    if (num_people >= 0) {
         population_ -= num_people;
     }
 }
 
 void Society::GrowCities() {
     City * biggest = cities_.at(1);
-    if (cities_.at(2)->get_population() > biggest->get_population()) {
-        biggest = cities_.at(2);
-    }
-    if (cities_.at(3)->get_population() > biggest->get_population()) {
-        biggest = cities_.at(3);
-    }
-    if (cities_.at(4)->get_population() > biggest->get_population()) {
-        biggest = cities_.at(4);
+    int bigPop = biggest->get_population();
+
+    for(int i = 2; i < 5; i++) {
+      if(cities_.at(i)->get_population() > bigPop) {
+        biggest = cities_.at(i);
+      }
     }
 
     for (int i = 1; i <= 4; i++) {
         City * c = cities_.at(i);
-        if (c->IsBig() == false){
+        if (!c->IsBig()){
             int prev = c->get_population();
             double ratio = (1.0 * c->get_population()) / biggest->get_population();
             c->Grow((int) ratio * .3 * c->get_population());
@@ -65,9 +62,8 @@ std::ostream& operator<<(std::ostream &os, const City &c) {
 }
 
 std::ostream& operator<<(std::ostream &os, const Society &s) {
-    os << *(s.cities_.at(1)) << std::endl;
-    os << *(s.cities_.at(2)) << std::endl;
-    os << *(s.cities_.at(3)) << std::endl;
-    os << *(s.cities_.at(4)) << std::endl;
+    for(int i = 1; i < 5; i++) {
+      os << *(s.cities_.at(i)) << std::endl;
+    }
     return os;
 }
