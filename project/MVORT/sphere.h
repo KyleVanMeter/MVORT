@@ -3,17 +3,17 @@
 
 #include "hitable.h"
 
-class sphere : public Hitable {
+class Sphere : public Hitable {
  public:
-   sphere() {}
-   sphere(Vec3 cen, float r) : center(cen), radius(r){};
+   Sphere() {}
+   Sphere(Vec3 cen, float r) : center(cen), radius(r){};
    virtual bool hit(const Ray &r, float tmin, float tmax,
                     Hit_Record &rec) const;
    Vec3 center;
    float radius;
 };
 
-bool sphere::hit(const Ray& r, float t_min, float t_max, Hit_Record& rec) const {
+bool Sphere::hit(const Ray& r, float t_min, float t_max, Hit_Record& rec) const {
   Vec3 oc = r.origin() - center;
   float a = dot(r.direction(), r.direction());
   float b = dot(oc, r.direction());
