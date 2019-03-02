@@ -30,19 +30,20 @@ int main() {
 
   std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
+  float R = cos(M_PI/4);
   Hitable *list[5];
   list[0] =
-      new Sphere(Vec3(0, 0, -1), 0.5, new Lambertian(Vec3(0.8, 0.3, 0.3)));
+      new Sphere(Vec3(0, 0, -1), 0.5, new Lambertian(Vec3(0.1, 0.2, 0.5)));
   list[1] =
-    new Sphere(Vec3(0, -100.5, -1), 100.0, new Lambertian(Vec3(0.8, 0.8, 0.0)));
+      new Sphere(Vec3(0, -100.5, -1), 100, new Lambertian(Vec3(0.8, 0.8, 0.0)));
   list[2] =
-    new Sphere(Vec3(1, 0, -1), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3));
+      new Sphere(Vec3(1, 0, -1), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3));
   list[3] =
-    new Sphere(Vec3(-1, 0, -1), 0.5, new Dielectic(1.5));
+      new Sphere(Vec3(-1, 0, -1), 0.5, new Dielectic(1.5));
   list[4] =
-    new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectic(1.5));
+      new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectic(1.5));
   Hitable *world = new Hitable_List(list, 5);
-  Camera cam;
+  Camera cam(Vec3(-2, 2, 1), Vec3(0, 0, 1), Vec3(0, 1, 0), 60, float(nx)/float(ny));
 
   for(int j = ny-1; j >= 0; j--) {
     for(int i = 0; i < nx; i++) {
