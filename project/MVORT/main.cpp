@@ -1,13 +1,15 @@
-#include <iostream>
-#include <fstream>
 #include "sphere.h"
 #include "hitable_list.h"
 #include "ray.h"
 #include "camera.h"
 #include "material.h"
+#include "inputparser.h"
+
+#include "QtGui/QImage"
+#include <fstream>
+#include <iostream>
 #include <stdlib.h>
 #include <vector>
-#include "QtGui/QImage"
 
 Vec3 color(const Ray &r, Hitable *world, int depth) {
   Hit_Record rec;
@@ -62,22 +64,17 @@ Hitable *random_scene() {
   return new Hitable_List(list, i);
 }
 
-void render(const std::string &filename) {
+void render(const std::string &filename, const std::string &format) {
   int nx = 800;
   int ny = 400;
   int pixel_count = nx * ny;
   int ns = 100;
 
   std::cout << "Rendering image to " + filename + " with " + std::to_string(nx) + "x" + std::to_string(ny) + " resolution.\n";
-
-  std::ofstream file(filename);
-
-  if (file.is_open()) {
-    file << "P3\n" << nx << " " << ny << "\n255\n";
-  } else {
-    std::cerr << "Unable to open file: " + filename;
-    std::exit(-1);
-  }
+  QImage *image = new QImage(nx, ny, QImage::Format::Format_RGB32);
+  QRgb pixel;
+  QString qfilename = QString::fromStdString(filename);
+  const char * qformat = format.c_str();
 
   float R = cos(M_PI/4);
   Hitable *list[5];
@@ -100,7 +97,6 @@ void render(const std::string &filename) {
   float aperature = 0.0;
   Camera cam(lookfrom, lookat, Vec3(0,1,0), 20, float(nx)/float(ny), aperature, dist_to_focus, 0.0, 1.0);
 
-  //std::vector<Vec3> framebuffer;
   int count = 0;
 
   for(int j = ny-1; j >= 0; j--) {
@@ -121,32 +117,48 @@ void render(const std::string &filename) {
       col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
 
       Vec3 rgb = 255.99 * col;
-
-      if (file.is_open()) {
-        file << rgb << "\n";
-      } else {
-        std::cerr << "Unable to write to file: " + filename + "\n";
-        std::exit(-1);
-      }
+      pixel = qRgb(rgb.r(), rgb.g(), rgb.b());
+      image->setPixel(i, -1 * (j-ny+1), pixel);
     }
   }
 
-  file.close();
+  image->save(qfilename, qformat, 100);
+
   std::cout << "\nDone.\n";
 }
 
-int main(int argc, char *argv[]) {
-  // TODO: QImage to write different image formats
-  // TODO: Switch statement on filename endings (split by the '.')
+int main(int argc, char **argv) {
+
+  InputParser input(argc, argv);
   std::string filename;
 
-  if(argc < 2) {
-    std::cerr << "Usage: ./out [filename.ppm]\n";
-    return -1;
-  }
-  filename = argv[1];
 
-  render(filename);
+  if(input.CMDOptionExists("-h")) {
+    std::cout << "Usage: MVORT [OPTION]\n \
+File output options:\n \
+-f [FILENAME.{ppm|jpg|png}]\n\n \
+Help:\n \
+-h\n";
+    return 0;
+  } else if (input.CMDOptionExists("-f")) {
+    std::string temp = input.getCMDOption("-f");
+    filename = temp;
+    temp = temp.substr(temp.find(".") + 1, temp.size());
+
+    if(temp != "png" && temp != "jpg" && temp != "ppm") {
+      std::cout << "Error: Unrecognized filetype.\n \
+Supported filetypes are:\n \
+                        .png\n \
+                        .jpg\n \
+                        .ppm\n";
+
+      return -1;
+    }
+
+    std::cout << temp << std::endl;
+
+    render(filename, temp);
+  }
 
   return 0;
 }
