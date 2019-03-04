@@ -7,6 +7,7 @@
 #include "material.h"
 #include <stdlib.h>
 #include <vector>
+#include "QtGui/QImage"
 
 Vec3 color(const Ray &r, Hitable *world, int depth) {
   Hit_Record rec;
@@ -15,9 +16,9 @@ Vec3 color(const Ray &r, Hitable *world, int depth) {
     Vec3 attenuation;
     if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
       return (attenuation * color(scattered, world, depth + 1));
-    } else {
-      return Vec3(0, 0, 0);
     }
+    return Vec3(0, 0, 0);
+
   } else {
     Vec3 unit_direction = unit_vector(r.direction());
     float t = 0.5 * (unit_direction.y() + 1.0);
@@ -61,9 +62,10 @@ Hitable *random_scene() {
   return new Hitable_List(list, i);
 }
 
-void render(std::string filename) {
+void render(const std::string &filename) {
   int nx = 800;
   int ny = 400;
+  int pixel_count = nx * ny;
   int ns = 100;
 
   std::cout << "Rendering image to " + filename + " with " + std::to_string(nx) + "x" + std::to_string(ny) + " resolution.\n";
@@ -111,18 +113,17 @@ void render(std::string filename) {
         Vec3 p = r.point_at_parameter(2.0);
         col += color(r, world, 0);
       }
-      count++;
 
-      printf("\rRendering pixel %d out of %d", count, nx*ny);
+      count++;
+      printf("\rRendering pixel %d out of %d", count, pixel_count);
+
       col /= float(ns);
       col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
 
-      int ir = int(255.99 * col[0]);
-      int ig = int(255.99 * col[1]);
-      int ib = int(255.99 * col[2]);
+      Vec3 rgb = 255.99 * col;
 
       if (file.is_open()) {
-        file << ir << " " << ig << " " << ib << "\n";
+        file << rgb << "\n";
       } else {
         std::cerr << "Unable to write to file: " + filename + "\n";
         std::exit(-1);
@@ -140,9 +141,8 @@ int main(int argc, char *argv[]) {
   if(argc < 2) {
     std::cerr << "Usage: ./out [filename.ppm]\n";
     return -1;
-  } else {
-    filename = argv[1];
   }
+  filename = argv[1];
 
   render(filename);
 
