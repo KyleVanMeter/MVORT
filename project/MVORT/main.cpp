@@ -136,6 +136,8 @@ void render(const std::string &filename) {
 }
 
 int main(int argc, char *argv[]) {
+  // TODO: QImage to write different image formats
+  // TODO: Switch statement on filename endings (split by the '.')
   std::string filename;
 
   if(argc < 2) {
