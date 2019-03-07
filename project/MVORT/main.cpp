@@ -6,7 +6,6 @@
 #include "inputparser.h"
 
 #include "QtGui/QImage"
-#include <fstream>
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
