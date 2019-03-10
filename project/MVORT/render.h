@@ -18,9 +18,13 @@ class Render {
     assert(!filename.empty());
 
     _filename.assign(filename);
-    // TODO Do not read until end of line in case there are other arguments,
-    // find some other way of ending substr
-    _format.assign(_filename.substr(_filename.find(".") + 1, _filename.size()));
+
+    // It should be noted here that the amount added to the delimiters is the
+    // length of the delimiters themselves
+    unsigned startDelim = _filename.find(".");
+    unsigned endDelim   = _filename.find(" ");
+    _format.assign(_filename.substr(startDelim + 1, endDelim - (startDelim + 1)));
+
     assert(_format == "png" || _format == "jpg" || _format == "ppm");
 
     _cam = new Camera(Vec3(0,0,0), Vec3(1,1,1), Vec3(0,1,0), 20, float(_xRes)/(float(_yRes)), 0.0, 0.0, 0.0, 0.0);
