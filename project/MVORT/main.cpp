@@ -34,7 +34,19 @@ Supported filetypes are:\n \
     }
 
     Render a(filename);
+
+    a.setSampleRate(100);
+    a.setXResolution(800);
+    a.setYResolution(400);
+
+    a.setCameraPosition(Vec3(5, 1, 2));
+    a.setCameraTarget(Vec3(0, 0, 0));
+    a.setCameraAperature(0.0);
+    a.setCameraFocalDist(1.0);
+    a.setCameraVFOV(20);
+
     a.makeRender();
+
 
   } else {
     std::cout << "Unrecognized option.\n \
