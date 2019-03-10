@@ -28,13 +28,20 @@ class Render {
 
     assert(_format == "png" || _format == "jpg" || _format == "ppm");
 
-    _cam = new Camera(Vec3(0,0,0), Vec3(1,1,1), Vec3(0,1,0), 20, float(_xRes)/(float(_yRes)), 0.0, 0.0, 0.0, 0.0);
     _xRes = 200;
     _yRes = 200;
     _sampleRate = 0;
     _aperature = 0.0;
     _focal = 10.0;
     _vFOV = 20;
+    _time0 = 0.0;
+    _time1 = 1.0;
+    _camRoll   = Vec3(0, 1, 0);
+    _camPos    = Vec3(0, 0, 0);
+    _camTarget = Vec3(1, 1, 1);
+
+    _cam = new Camera(_camPos, _camTarget, _camRoll, _vFOV,
+                      float(_xRes) / (float(_yRes)), _aperature, _focal, _time0, _time1);
   }
 
   void makeRender();
@@ -68,6 +75,15 @@ class Render {
   int getCameraVFOV() { return _vFOV; }
   void setCameraVFOV(int x) { _vFOV = x; }
 
+  Vec3 getCameraRoll() { return _camRoll; }
+  void setCameraRoll(Vec3 roll) { _camRoll = roll; }
+
+  int getInitialTime() { return _time0; }
+  void setInitialTime(int x) { _time0 = x; }
+
+  int getEndTime() { return _time1; }
+  void setEndTime(int x) { _time1 = x; }
+
   /* --------------------------------------------------------------------------------------
      Public Resolution member functions
      -------------------------------------------------------------------------------------- */
@@ -83,9 +99,9 @@ private:
 
   Hitable *_world;
   Camera *_cam;
-  float _aperature, _focal;
+  float _aperature, _focal, _time0, _time1;
   int _sampleRate, _vFOV, _xRes, _yRes;
-  Vec3 _camPos, _camTarget;
+  Vec3 _camPos, _camTarget, _camRoll;
 
   std::string _filename;
   std::string _format;
@@ -96,10 +112,14 @@ void Render::setScene(std::vector<std::unique_ptr<Hitable> > sceneDescription) {
 
   int k = 0;
   for(auto &e : sceneDescription) {
-    list[k++] = e.get();
+    // We release the control of the object from the unique_ptr to that of
+    // list[], is no longer automatically deleted, but is instead bound to
+    // the lifetime of the list[] object
+    list[k++] = e.release();
   }
 
   _world = new Hitable_List(list, k);
+
 }
 
 Vec3 Render::color(const Ray &r, Hitable *world, int depth) {
@@ -119,49 +139,41 @@ Vec3 Render::color(const Ray &r, Hitable *world, int depth) {
   }
 }
 
+/// This function makes the call to render each pixel stored in the QRgb object,
+/// which is rendered to the filename passed to the Render constructor after the
+/// rendering is done.  This function also contains the anti-aliasing logic
+/// (since we are just averaging out several rays per pixel)
 void Render::makeRender() {
   int nx = _xRes;
   int ny = _yRes;
   int pixel_count = nx * ny;
 
   std::cout << "Rendering image to " + _filename + " with " + std::to_string(nx) + "x" + std::to_string(ny) + " resolution.\n";
+
   QImage *image = new QImage(nx, ny, QImage::Format::Format_RGB32);
   QRgb pixel;
   QString qfilename = QString::fromStdString(_filename);
   const char * qformat = _format.c_str();
 
-  float R = cos(M_PI/4);
-  Hitable *list[5];
-  list[0] =
-      new Sphere(Vec3(0, 0, -1), 0.5, new Lambertian(Vec3(0.1, 0.2, 0.5)));
-  list[1] =
-      new Sphere(Vec3(0, -100.5, -1), 100, new Lambertian(Vec3(0.8, 0.8, 0.0)));
-  list[2] =
-      new Sphere(Vec3(1, 0, -1), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3));
-  list[3] =
-      new Sphere(Vec3(-1, 0, -1), 0.5, new Dielectic(1.5));
-  list[4] =
-      new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectic(1.5));
-  Hitable *world = new Hitable_List(list, 5);
-  //world = random_scene();
-
-  Camera cam(_camPos, _camTarget, Vec3(0,1,0), _vFOV, float(nx)/float(ny), _aperature, _focal, 0.0, 1.0);
+  Camera cam(_camPos, _camTarget, _camRoll, _vFOV, float(nx) / float(ny),
+             _aperature, _focal, _time0, _time1);
 
   int count = 0;
 
   for(int j = ny-1; j >= 0; j--) {
     for(int i = 0; i < nx; i++) {
+
+      count++;
+      printf("\rRendering pixel %d out of %d", count, pixel_count);
+
       Vec3 col(0,0,0);
       for(int k = 0; k < _sampleRate; k++) {
         float u = float(i + drand48()) / float(nx);
         float v = float(j + drand48()) / float(ny);
         Ray r = cam.get_ray(u, v);
         Vec3 p = r.point_at_parameter(2.0);
-        col += color(r, world, 0);
+        col += color(r, _world, 0);
       }
-
-      count++;
-      printf("\rRendering pixel %d out of %d", count, pixel_count);
 
       col /= float(_sampleRate);
       col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));

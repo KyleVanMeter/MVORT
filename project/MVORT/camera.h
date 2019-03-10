@@ -14,6 +14,9 @@ Vec3 random_in_unit_disk() {
 
 class Camera {
  public:
+   // The argument list for Camera are: Camera position, Camera target, roll
+   // normal vector, vertical fov in degrees, aspect ratio, aperature size,
+   // focal distance, time0, and time1
    Camera(Vec3 lookfrom, Vec3 lookat, Vec3 vup, float vfov, float aspect,
           float aperature, float focus_dist, float t0, float t1) {
      time0 = t0;
