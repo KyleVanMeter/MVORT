@@ -18,5 +18,5 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Input
-HEADERS += camera.h hitable.h hitable_list.h material.h ray.h sphere.h vec3.h
+HEADERS += camera.h hitable.h hitable_list.h material.h ray.h sphere.h vec3.h render.h
 SOURCES += main.cpp vec3.cpp

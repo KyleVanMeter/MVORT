@@ -241,7 +241,8 @@ DIST          = /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/spec_pre.prf \
 		material.h \
 		ray.h \
 		sphere.h \
-		vec3.h main.cpp \
+		vec3.h \
+		render.h main.cpp \
 		vec3.cpp
 QMAKE_TARGET  = MVORT
 DESTDIR       = 
@@ -638,7 +639,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents camera.h hitable.h hitable_list.h material.h ray.h sphere.h vec3.h $(DISTDIR)/
+	$(COPY_FILE) --parents camera.h hitable.h hitable_list.h material.h ray.h sphere.h vec3.h render.h $(DISTDIR)/
 	$(COPY_FILE) --parents main.cpp vec3.cpp $(DISTDIR)/
 
 
@@ -687,11 +688,13 @@ compiler_clean: compiler_moc_predefs_clean
 
 ####### Compile
 
-main.o: main.cpp sphere.h \
+main.o: main.cpp inputparser.h \
+		render.h \
+		hitable_list.h \
 		hitable.h \
 		ray.h \
 		vec3.h \
-		hitable_list.h \
+		sphere.h \
 		camera.h \
 		material.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/QImage \
