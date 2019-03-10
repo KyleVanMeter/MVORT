@@ -1,7 +1,9 @@
 #include "inputparser.h"
 #include "render.h"
 
+#include <memory>
 #include <iostream>
+#include <vector>
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
@@ -44,6 +46,11 @@ Supported filetypes are:\n \
     a.setCameraAperature(0.0);
     a.setCameraFocalDist(1.0);
     a.setCameraVFOV(20);
+
+    std::vector<std::unique_ptr<Hitable>> scene;
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Vec3(0, 0, -1), 0.5, new Lambertian(Vec3(0.1, 0.2, 0.5)))));
+    a.setScene(std::move(scene));
 
     a.makeRender();
 

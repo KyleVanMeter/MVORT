@@ -8,6 +8,7 @@
 #include "ray.h"
 
 #include "QtGui/QImage"
+#include <memory>
 #include <cassert>
 #include <string>
 #include <vector>
@@ -38,10 +39,16 @@ class Render {
 
   void makeRender();
 
-  void setScene(Hitable *list[]);
+  /* --------------------------------------------------------------------------------------
+     Public Scene member functions
+     -------------------------------------------------------------------------------------- */
+  void setScene(std::vector<std::unique_ptr<Hitable>> sceneDescription);
   std::vector<Hitable> getScene();
   Hitable *randomScene();
 
+  /* --------------------------------------------------------------------------------------
+     Public Camera member functions
+     -------------------------------------------------------------------------------------- */
   void setCamera(Vec3 lookfrom, Vec3 lookat, Vec3 vup, float vfov, float aspect,
                  float aperature, float focus_dist, float t0, float t1);
   Camera *getCamera() { return _cam; }
@@ -61,6 +68,9 @@ class Render {
   int getCameraVFOV() { return _vFOV; }
   void setCameraVFOV(int x) { _vFOV = x; }
 
+  /* --------------------------------------------------------------------------------------
+     Public Resolution member functions
+     -------------------------------------------------------------------------------------- */
   int getSampleRate() { return _sampleRate; }
   void setSampleRate(int k) { _sampleRate = k; }
 
@@ -81,6 +91,16 @@ private:
   std::string _format;
 };
 
+void Render::setScene(std::vector<std::unique_ptr<Hitable> > sceneDescription) {
+  Hitable **list = new Hitable*[sceneDescription.size()+1];
+
+  int k = 0;
+  for(auto &e : sceneDescription) {
+    list[k++] = e.get();
+  }
+
+  _world = new Hitable_List(list, k);
+}
 
 Vec3 Render::color(const Ray &r, Hitable *world, int depth) {
   Hit_Record rec;
