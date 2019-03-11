@@ -6,6 +6,7 @@
 #include <vector>
 #include <stdlib.h>
 
+
 int main(int argc, char **argv) {
 
   InputParser input(argc, argv);
@@ -56,15 +57,18 @@ Supported filetypes are:\n \
     // hard-coding it in the render functionality itself
     std::vector<std::unique_ptr<Hitable>> scene;
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(0, 0, -1), 0.5, new Lambertian(Vec3(0.1, 0.2, 0.5)))));
+                                             new Sphere(Vec3(0, 0, -1), 0.5, new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
     scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-        Vec3(0, -100.5, -1), 100, new Lambertian(Vec3(0.8, 0.8, 0.0)))));
+                                                        Vec3(0, -100.5, -1), 100, new Lambertian(new ConstantTexture(Vec3(0.8, 0.8, 0.0))))));
     scene.push_back(std::unique_ptr<Hitable>(
         new Sphere(Vec3(1, 0, -1), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3))));
     scene.push_back(std::unique_ptr<Hitable>(
         new Sphere(Vec3(-1, 0, -1), 0.5, new Dielectic(1.5))));
     scene.push_back(std::unique_ptr<Hitable>(
         new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectic(1.5))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Vec3(-2, 0, -2), 1,
+                   new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
 
     a.setScene(std::move(scene));
 

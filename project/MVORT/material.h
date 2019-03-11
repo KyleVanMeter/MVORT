@@ -35,10 +35,44 @@ bool refract(const Vec3 &v, const Vec3 &n, float ni_over_nt, Vec3 &refracted) {
   return false;
 }
 
+class Texture {
+ public:
+  virtual Vec3 value(float u, float v, const Vec3 &p) const = 0;
+};
+
+class ConstantTexture : public Texture {
+ public:
+  ConstantTexture() {}
+  ConstantTexture(Vec3 c) : _color(c) {}
+  virtual Vec3 value(float u, float v, const Vec3 &p) const {
+    return _color;
+  }
+
+ private:
+  Vec3 _color;
+};
+
+
 class Material {
 public:
   virtual bool scatter(const Ray &r_in, const Hit_Record &rec,
                        Vec3 &attenuation, Ray &scattered) const = 0;
+};
+
+class Lambertian : public Material {
+public:
+  Lambertian(Texture *a) : _albedo(a) {}
+  virtual bool scatter(const Ray &r_in, const Hit_Record &rec,
+                       Vec3 &attenuation, Ray &scattered) const {
+    Vec3 target = rec.p + rec.normal + random_in_unit_sphere();
+    scattered = Ray(rec.p, target - rec.p);
+    attenuation = _albedo->value(0, 0, rec.p);
+
+    return true;
+  }
+
+private:
+  Texture *_albedo;
 };
 
 class Metal : public Material {
@@ -59,20 +93,6 @@ public:
   }
 
   float fuzz;
-  Vec3 albedo;
-};
-
-class Lambertian : public Material {
-public:
-  Lambertian(const Vec3 &a) : albedo(a){};
-  virtual bool scatter(const Ray &r_in, const Hit_Record &rec,
-                       Vec3 &attenuation, Ray &scattered) const {
-    Vec3 target = rec.p + rec.normal + random_in_unit_sphere();
-    scattered = Ray(rec.p, target - rec.p, r_in.time());
-    attenuation = albedo;
-    return true;
-  }
-
   Vec3 albedo;
 };
 

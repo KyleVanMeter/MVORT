@@ -193,7 +193,7 @@ Hitable * Render::randomScene() {
   int n = 500;
   Hitable **list = new Hitable*[n+1];
 
-  list[0] = new Sphere(Vec3(0, -1000, 0), 1000, new Lambertian(Vec3(0.5, 0.5, 0.5)));
+  list[0] = new Sphere(Vec3(0, -1000, 0), 1000, new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))));
   int i = 1;
   for(int a = -11; a < 11; a++) {
     for(int b = -11; b < 11; b++) {
@@ -203,8 +203,8 @@ Hitable * Render::randomScene() {
         if(choose_mat < 0.8) {
           list[i++] = new Moving_Sphere(
               center, center + Vec3(0, 0.5 * drand48(), 0), 0.0, 1.0, 0.2,
-              new Lambertian(Vec3(drand48() * drand48(), drand48() * drand48(),
-                                  drand48() * drand48())));
+              new Lambertian(new ConstantTexture(Vec3(drand48() * drand48(), drand48() * drand48(),
+                                                      drand48() * drand48()))));
           // list[i++] = new Sphere(
           //     center, 0.2,
           //     new Lambertian(Vec3(drand48() * drand48(), drand48() * drand48(),
@@ -219,7 +219,7 @@ Hitable * Render::randomScene() {
   }
 
   list[i++] = new Sphere(Vec3(0, 1, 0), 1.0, new Dielectic(1.5));
-  list[i++] = new Sphere(Vec3(-4, 1, 0), 1.0, new Lambertian(Vec3(0.4, 0.2, 0.1)));
+  list[i++] = new Sphere(Vec3(-4, 1, 0), 1.0, new Lambertian(new ConstantTexture(Vec3(0.4, 0.2, 0.1))));
   list[i++] = new Sphere(Vec3(4, 1, 0), 1.0, new Metal(Vec3(0.7, 0.6, 0.5), 0.0));
 
   return new Hitable_List(list, i);
