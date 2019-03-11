@@ -52,6 +52,25 @@ class ConstantTexture : public Texture {
   Vec3 _color;
 };
 
+class CheckerBoard : public Texture {
+ public:
+  CheckerBoard() {}
+  CheckerBoard(Texture *t0, Texture *t1) : _even(t0), _odd(t1) {}
+  virtual Vec3 value(float u, float v, const Vec3 &p) const {
+    float pattern = sin(10 * p.x()) * sin(10 * p.y()) * sin(10 * p.z());
+    if(pattern < 0) {
+      return _odd->value(u, v, p);
+    }
+
+    return _even->value(u, v, p);
+  }
+
+
+ private:
+  Texture *_even;
+  Texture *_odd;
+};
+
 
 class Material {
 public:

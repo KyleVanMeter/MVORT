@@ -56,19 +56,23 @@ Supported filetypes are:\n \
     // easily interface with arbitrary scene data abstractly rather than
     // hard-coding it in the render functionality itself
     std::vector<std::unique_ptr<Hitable>> scene;
+
+    Texture *checker =
+        new CheckerBoard(new ConstantTexture(Vec3(0.5, 0.2, 0.1)),
+                         new ConstantTexture(Vec3(0.9, 0.9, 0.9)));
+
     scene.push_back(std::unique_ptr<Hitable>(
-                                             new Sphere(Vec3(0, 0, -1), 0.5, new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
-    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-                                                        Vec3(0, -100.5, -1), 100, new Lambertian(new ConstantTexture(Vec3(0.8, 0.8, 0.0))))));
+        new Sphere(Vec3(0, 0, -1), 0.5,
+                   new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Vec3(0, -100.5, -1), 100,
+                   new Lambertian(checker))));
     scene.push_back(std::unique_ptr<Hitable>(
         new Sphere(Vec3(1, 0, -1), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3))));
     scene.push_back(std::unique_ptr<Hitable>(
         new Sphere(Vec3(-1, 0, -1), 0.5, new Dielectic(1.5))));
     scene.push_back(std::unique_ptr<Hitable>(
         new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectic(1.5))));
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(-2, 0, -2), 1,
-                   new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
 
     a.setScene(std::move(scene));
 
