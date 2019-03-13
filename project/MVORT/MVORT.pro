@@ -20,3 +20,5 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # Input
 HEADERS += camera.h hitable.h hitable_list.h material.h ray.h sphere.h vec3.h render.h
 SOURCES += main.cpp vec3.cpp
+QMAKE_CXXFLAGS += -fopenmp
+LIBS += -fopenmp

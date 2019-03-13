@@ -6,7 +6,6 @@
 #include <vector>
 #include <stdlib.h>
 
-
 int main(int argc, char **argv) {
 
   InputParser input(argc, argv);
@@ -39,13 +38,13 @@ Supported filetypes are:\n \
     Render a(filename);
 
     a.setSampleRate(100);
-    a.setXResolution(800);
-    a.setYResolution(400);
+    a.setXResolution(1600);
+    a.setYResolution(800);
 
     a.setCameraPosition(Vec3(5, 1, 2));
-    a.setCameraTarget(Vec3(0, 0, 0));
-    a.setCameraAperature(0.0);
-    a.setCameraFocalDist(1.0);
+    a.setCameraTarget(Vec3(1, 0, -1));
+    a.setCameraAperature(0.15);
+    a.setCameraFocalDist(5.0);
     a.setCameraVFOV(20);
 
     // To render we cannot simply pass a vector of Spheres, as we they are
@@ -56,6 +55,8 @@ Supported filetypes are:\n \
     // easily interface with arbitrary scene data abstractly rather than
     // hard-coding it in the render functionality itself
     std::vector<std::unique_ptr<Hitable>> scene;
+
+    std::string textureFile = "earthmap.jpg";
 
     Texture *checker =
         new CheckerBoard(new ConstantTexture(Vec3(0.5, 0.2, 0.1)),
@@ -68,11 +69,13 @@ Supported filetypes are:\n \
         new Sphere(Vec3(0, -100.5, -1), 100,
                    new Lambertian(checker))));
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(1, 0, -1), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3))));
+        new Sphere(Vec3(0, 0, -2.75), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3))));
+    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+        Vec3(1, 0, -1), 0.5, new Lambertian(new ImageTexture(textureFile)))));
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(-1, 0, -1), 0.5, new Dielectic(1.5))));
+        new Sphere(Vec3(1, 0, -2), 0.5, new Dielectic(1.5))));
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(-1, 0, -1), -0.45, new Dielectic(1.5))));
+        new Sphere(Vec3(1, 0, -2), -0.45, new Dielectic(1.5))));
 
     a.setScene(std::move(scene));
 

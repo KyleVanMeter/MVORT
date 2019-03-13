@@ -78,11 +78,11 @@ class Render {
   Vec3 getCameraRoll() { return _camRoll; }
   void setCameraRoll(Vec3 roll) { _camRoll = roll; }
 
-  int getInitialTime() { return _time0; }
-  void setInitialTime(int x) { _time0 = x; }
+  float getInitialTime() { return _time0; }
+  void setInitialTime(float x) { _time0 = x; }
 
-  int getEndTime() { return _time1; }
-  void setEndTime(int x) { _time1 = x; }
+  float getEndTime() { return _time1; }
+  void setEndTime(float x) { _time1 = x; }
 
   /* --------------------------------------------------------------------------------------
      Public Resolution member functions
@@ -91,6 +91,7 @@ class Render {
   void setSampleRate(int k) { _sampleRate = k; }
 
   std::pair<int, int> getResolution() { return std::make_pair(_xRes, _yRes); }
+  void setResolution(std::pair<int, int> a) { _xRes = a.first; _yRes = a.second; }
   void setXResolution(int x) { _xRes = x; }
   void setYResolution(int y) { _yRes = y; }
 
@@ -119,7 +120,6 @@ void Render::setScene(std::vector<std::unique_ptr<Hitable> > sceneDescription) {
   }
 
   _world = new Hitable_List(list, k);
-
 }
 
 Vec3 Render::color(const Ray &r, Hitable *world, int depth) {
@@ -139,10 +139,10 @@ Vec3 Render::color(const Ray &r, Hitable *world, int depth) {
   }
 }
 
-/// This function makes the call to render each pixel stored in the QRgb object,
-/// which is rendered to the filename passed to the Render constructor after the
-/// rendering is done.  This function also contains the anti-aliasing logic
-/// (since we are just averaging out several rays per pixel)
+// This function makes the call to render each pixel stored in the QRgb object,
+// which is rendered to the filename passed to the Render constructor after the
+// rendering is done.  This function also contains the anti-aliasing logic
+// (since we are just averaging out several rays per pixel)
 void Render::makeRender() {
   int nx = _xRes;
   int ny = _yRes;
@@ -160,6 +160,7 @@ void Render::makeRender() {
 
   int count = 0;
 
+  #pragma omp parallel for
   for(int j = ny-1; j >= 0; j--) {
     for(int i = 0; i < nx; i++) {
 
@@ -179,11 +180,14 @@ void Render::makeRender() {
       col = Vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
 
       Vec3 rgb = 255.99 * col;
+      // TODO: do not use setPixel frequently.  Look into replacing it with
+      // bit-level manipulation for extra speed
       pixel = qRgb(rgb.r(), rgb.g(), rgb.b());
       image->setPixel(i, -1 * (j-ny+1), pixel);
     }
   }
 
+  // TODO: Look into updating this so it can be written (QPainter) is real time
   image->save(qfilename, qformat, 100);
 
   std::cout << "\nDone.\n";

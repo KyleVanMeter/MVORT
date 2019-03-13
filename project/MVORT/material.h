@@ -3,6 +3,7 @@
 
 #include "ray.h"
 #include "hitable.h"
+#include <QtGui/qimagereader.h>
 
 struct Hit_Record;
 
@@ -71,6 +72,122 @@ class CheckerBoard : public Texture {
   Texture *_odd;
 };
 
+// class ImageTexture : public Texture {
+//  public:
+//   ImageTexture() {}
+//   // ImageTexture(unsigned char *pixels, int x, int y)
+//   //     : _data(pixels), _nx(x), _ny(y) {}
+//   ImageTexture(QImage *image, int x, int y) : _qData(image), _nx(x), _ny(y) {
+//     uchar *qDataCopy = new uchar[_qData->byteCount()];
+//     memcpy(&qDataCopy, _qData->bits(), _qData->byteCount());
+//     _data = qDataCopy;
+//   }
+
+//   ImageTexture(std::string &fileName) {
+//     QString qFileName = QString::fromStdString(fileName);
+
+//     QImage image(qFileName);
+//     _qData = &image;
+//     _copyToData();
+//   }
+
+//   virtual Vec3 value(float u, float v, const Vec3 &p) const {
+//     int i = u * _nx;
+//     int j = (1 - v) * _ny - 0.001;
+//     if(i < 0) {
+//       i = 0;
+//     }
+
+//     if(j < 0) {
+//       j = 0;
+//     }
+
+//     if(i > _nx - 1) {
+//       i = _nx - 1;
+//     }
+
+//     if(j > _ny - 1) {
+//       j = _ny - 1;
+//     }
+
+//     float r = int(_data[3 * i + 3 * _nx * j]) / 255.0;
+//     float g = int(_data[3 * i + 3 * _nx * j + 1]) / 255.0;
+//     float b = int(_data[3 * i + 3 * _nx * j + 2]) / 255.0;
+
+//     QRgb *colors = (QRgb *)_qData->scanLine(int(v));
+//     QRgb pixelColor = colors[int(u)];
+//     float red = qRed(pixelColor);
+//     float blue = qBlue(pixelColor);
+//     float green = qGreen(pixelColor);
+
+//     //return Vec3(red, green, blue);
+//     return Vec3(r,g,b);
+//     // this probably doesn't work because _data is a dangling pointer?
+//     // return Vec3(1,1,1);
+//   }
+
+// private:
+//   void _copyToData() {
+//     // TODO byteCount is deprecated
+//     uchar *qDataCopy = new uchar[_qData->byteCount()];
+//     memcpy(qDataCopy, _qData->bits(), _qData->byteCount());
+//     memcpy(_data, qDataCopy, _qData->byteCount());
+//     _data = qDataCopy;
+//     std::cout << _data[1] << ", " << qDataCopy[1] << "bytesCount() = " << _qData->byteCount() << "\n";
+//   }
+
+//   // TODO: Use Qt for the image reading here rather than converting to an char
+//   // array without using setPixel/getPixel as that is very slow
+//   QImage *_qData;
+//   unsigned char *_data;
+//   int _nx, _ny;
+// };
+
+class image_texture : public Texture {
+public:
+  image_texture() {}
+  image_texture(unsigned char *pixels)
+      : data(pixels) {
+    QImage temp("earthmap.jpg");
+    img = temp.copy();
+    nx = img.width();
+    ny = img.height();
+  }
+
+  virtual Vec3 value(float u, float v, const Vec3 &p) const;
+  QImage img;
+  unsigned char *data;
+  int nx, ny;
+};
+
+Vec3 image_texture::value(float u, float v, const Vec3 &p) const {
+  int i = (u)* nx;
+  int j = (1 - v) * ny - 0.001;
+  if (i < 0)
+    i = 0;
+  if (j < 0)
+    j = 0;
+  if (i > nx - 1)
+    i = nx - 1;
+  if (j > ny - 1)
+    j = ny - 1;
+  float r = int(data[3 * i + 3 * nx * j]) / 255.0;
+  float g = int(data[3 * i + 3 * nx * j + 1]) / 255.0;
+  float b = int(data[3 * i + 3 * nx * j + 2]) / 255.0;
+
+  //std::cout << "(u: " << u << ", v: " << v << "), (i: " << i << ", j: " << j << ")\n";
+  // QRgb *colors = (QRgb *)img.scanLine(int(i));
+  // QRgb pixelColor = colors[int(j)];
+  // float red = qRed(pixelColor) / 255.0;
+  // float blue = qBlue(pixelColor) / 255.0;
+  // float green = qGreen(pixelColor) / 255.0;
+  // QRgb result = img.pixel(i, j);
+  // float r = qRed(result) / 255.0;
+  // float g = qRed(result) / 255.0;
+  // float b = qRed(result) / 255.0;
+
+  return Vec3(r, g, b);
+}
 
 class Material {
 public:
@@ -85,7 +202,7 @@ public:
                        Vec3 &attenuation, Ray &scattered) const {
     Vec3 target = rec.p + rec.normal + random_in_unit_sphere();
     scattered = Ray(rec.p, target - rec.p);
-    attenuation = _albedo->value(0, 0, rec.p);
+    attenuation = _albedo->value(rec.u, rec.v, rec.p);
 
     return true;
   }

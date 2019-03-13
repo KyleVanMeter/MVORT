@@ -14,7 +14,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -fopenmp -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I. -I. -I/home/gnuuser/Qt/5.10.1/gcc_64/include -I/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui -I/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/gnuuser/Qt/5.10.1/gcc_64/bin/qmake
 DEL_FILE      = rm -f
@@ -38,7 +38,7 @@ DISTNAME      = MVORT1.0.0
 DISTDIR = /home/gnuuser/COLLEGE/CSCI3010/work/project/MVORT/.tmp/MVORT1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/gnuuser/Qt/5.10.1/gcc_64/lib
-LIBS          = $(SUBLIBS) -L/home/gnuuser/Qt/5.10.1/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -fopenmp -L/home/gnuuser/Qt/5.10.1/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -670,7 +670,7 @@ compiler_moc_predefs_make_all: moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc_predefs.h
 moc_predefs.h: /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/data/dummy.cpp
-	g++ -pipe -O2 -Wall -W -dM -E -o moc_predefs.h /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/data/dummy.cpp
+	g++ -pipe -fopenmp -O2 -Wall -W -dM -E -o moc_predefs.h /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all:
 compiler_moc_header_clean:
