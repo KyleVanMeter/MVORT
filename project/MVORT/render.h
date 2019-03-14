@@ -127,15 +127,17 @@ Vec3 Render::color(const Ray &r, Hitable *world, int depth) {
   if (world->hit(r, 0.001, MAXFLOAT, rec)) {
     Ray scattered;
     Vec3 attenuation;
+    Vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
     if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-      return (attenuation * color(scattered, world, depth + 1));
+      return (emitted + attenuation * color(scattered, world, depth + 1));
     }
-    return Vec3(0, 0, 0);
+    return emitted;
 
   } else {
-    Vec3 unit_direction = unit_vector(r.direction());
-    float t = 0.5 * (unit_direction.y() + 1.0);
-    return ((1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0));
+    /* Vec3 unit_direction = unit_vector(r.direction()); */
+    /* float t = 0.5 * (unit_direction.y() + 1.0); */
+    /* return ((1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0)); */
+    return Vec3(0, 0, 0);
   }
 }
 

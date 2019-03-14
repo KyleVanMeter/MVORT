@@ -37,15 +37,15 @@ Supported filetypes are:\n \
 
     Render a(filename);
 
-    a.setSampleRate(100);
-    a.setXResolution(1600);
-    a.setYResolution(800);
+    a.setSampleRate(6000);
+    a.setXResolution(800);
+    a.setYResolution(400);
 
     a.setCameraPosition(Vec3(5, 1, 2));
     a.setCameraTarget(Vec3(1, 0, -1));
     a.setCameraAperature(0.15);
     a.setCameraFocalDist(5.0);
-    a.setCameraVFOV(20);
+    a.setCameraVFOV(50);
 
     // To render we cannot simply pass a vector of Spheres, as we they are
     // derived from the abstract class Hitable (for instance how would we add a
@@ -62,21 +62,41 @@ Supported filetypes are:\n \
         new CheckerBoard(new ConstantTexture(Vec3(0.5, 0.2, 0.1)),
                          new ConstantTexture(Vec3(0.9, 0.9, 0.9)));
 
+    scene.push_back(std::unique_ptr<Hitable>(new Triangle(
+        Vec3(0, 0, 0), Vec3(0, 1, 1), Vec3(0, 1, 2),
+        new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
+    scene.push_back(std::unique_ptr<Hitable>(new Triangle(
+        Vec3(0, 0, 0), Vec3(0, 0, 1), Vec3(0, 1, 2),
+        new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(0, 0, -1), 0.5,
-                   new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
+        new Sphere(Vec3(0, 0, 0), 0.2,
+                   new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Vec3(0, 1, 1), 0.2,
+                   new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Vec3(0, 1, 2), 0.2,
+                   new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
+    // scene.push_back(std::unique_ptr<Hitable>(
+    //     new Sphere(Vec3(0, 0, -1), 0.5,
+    //                new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
     scene.push_back(std::unique_ptr<Hitable>(
         new Sphere(Vec3(0, -100.5, -1), 100,
                    new Lambertian(checker))));
+    // scene.push_back(std::unique_ptr<Hitable>(
+    //     new Sphere(Vec3(0, 0, -2.75), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3))));
+    // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+    //     Vec3(1, 0, -1), 0.5, new Lambertian(new ImageTexture(textureFile)))));
+    // scene.push_back(std::unique_ptr<Hitable>(
+    //     new Sphere(Vec3(1, 0, -2), 0.5, new Dielectic(1.5))));
+    // scene.push_back(std::unique_ptr<Hitable>(
+    //     new Sphere(Vec3(1, 0, -2), -0.45, new Dielectic(1.5))));
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(0, 0, -2.75), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3))));
-    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-        Vec3(1, 0, -1), 0.5, new Lambertian(new ImageTexture(textureFile)))));
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(1, 0, -2), 0.5, new Dielectic(1.5))));
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(1, 0, -2), -0.45, new Dielectic(1.5))));
-
+        new Sphere(Vec3(1, 4, -1), 1.5,
+                   new DiffuseLight(new ConstantTexture(Vec3(3, 3, 3))))));
+    // scene.push_back(std::unique_ptr<Hitable>(
+    //     new Sphere(Vec3(4, 4, -3), 1.5,
+    //                new DiffuseLight(new ConstantTexture(Vec3(2, 1, 5))))));
     a.setScene(std::move(scene));
 
     a.makeRender();
