@@ -3,6 +3,7 @@
 
 #include "hitable_list.h"
 #include "sphere.h"
+#include "triangle.h"
 #include "camera.h"
 #include "material.h"
 #include "ray.h"
@@ -44,7 +45,12 @@ class Render {
                       float(_xRes) / (float(_yRes)), _aperature, _focal, _time0, _time1);
   }
 
+  /* --------------------------------------------------------------------------------------
+     Public Render member functions
+     --------------------------------------------------------------------------------------
+   */
   void makeRender();
+  QImage *getRender();
 
   /* --------------------------------------------------------------------------------------
      Public Scene member functions
@@ -96,6 +102,7 @@ class Render {
   void setYResolution(int y) { _yRes = y; }
 
 private:
+  QImage *_Render();
   Vec3 color(const Ray &r, Hitable *world, int depth);
 
   Hitable *_world;
@@ -145,7 +152,7 @@ Vec3 Render::color(const Ray &r, Hitable *world, int depth) {
 // which is rendered to the filename passed to the Render constructor after the
 // rendering is done.  This function also contains the anti-aliasing logic
 // (since we are just averaging out several rays per pixel)
-void Render::makeRender() {
+QImage *Render::_Render() {
   int nx = _xRes;
   int ny = _yRes;
   int pixel_count = nx * ny;
@@ -154,8 +161,6 @@ void Render::makeRender() {
 
   QImage *image = new QImage(nx, ny, QImage::Format::Format_RGB32);
   QRgb pixel;
-  QString qfilename = QString::fromStdString(_filename);
-  const char * qformat = _format.c_str();
 
   Camera cam(_camPos, _camTarget, _camRoll, _vFOV, float(nx) / float(ny),
              _aperature, _focal, _time0, _time1);
@@ -188,6 +193,18 @@ void Render::makeRender() {
       image->setPixel(i, -1 * (j-ny+1), pixel);
     }
   }
+
+  return(image);
+}
+
+QImage *Render::getRender() {
+  return(_Render());
+}
+
+void Render::makeRender() {
+  QImage *image = _Render();
+  QString qfilename = QString::fromStdString(_filename);
+  const char * qformat = _format.c_str();
 
   // TODO: Look into updating this so it can be written (QPainter) is real time
   image->save(qfilename, qformat, 100);

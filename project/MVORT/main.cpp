@@ -37,7 +37,7 @@ Supported filetypes are:\n \
 
     Render a(filename);
 
-    a.setSampleRate(6000);
+    a.setSampleRate(100);
     a.setXResolution(800);
     a.setYResolution(400);
 

@@ -242,7 +242,8 @@ DIST          = /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/spec_pre.prf \
 		ray.h \
 		sphere.h \
 		vec3.h \
-		render.h main.cpp \
+		render.h \
+		triangle.h main.cpp \
 		vec3.cpp
 QMAKE_TARGET  = MVORT
 DESTDIR       = 
@@ -639,7 +640,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents camera.h hitable.h hitable_list.h material.h ray.h sphere.h vec3.h render.h $(DISTDIR)/
+	$(COPY_FILE) --parents camera.h hitable.h hitable_list.h material.h ray.h sphere.h vec3.h render.h triangle.h $(DISTDIR)/
 	$(COPY_FILE) --parents main.cpp vec3.cpp $(DISTDIR)/
 
 
@@ -695,10 +696,10 @@ main.o: main.cpp inputparser.h \
 		ray.h \
 		vec3.h \
 		sphere.h \
+		triangle.h \
 		camera.h \
 		material.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/QImage \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qimage.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qimagereader.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qtguiglobal.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qglobal.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qconfig-bootstrapped.h \
@@ -722,32 +723,42 @@ main.o: main.cpp inputparser.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qnumeric.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qversiontagging.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qtgui-config.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qcolor.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qrgb.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qnamespace.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qstringlist.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qlist.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qalgorithms.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qiterator.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qbytearray.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qrefcount.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qnamespace.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qarraydata.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qhashfunctions.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qcoreapplication.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qstring.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qchar.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qbytearray.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qstringliteral.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qstringalgorithms.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qstringview.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qobject.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qlist.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qalgorithms.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qiterator.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qhashfunctions.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qpair.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qstringlist.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qregexp.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qcoreevent.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qmetatype.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qobject_impl.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qeventloop.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qimage.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qcolor.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qrgb.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qrgba64.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qpaintdevice.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qwindowdefs.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qobjectdefs.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qobjectdefs_impl.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qwindowdefs_win.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qrect.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qmargins.h \
@@ -760,16 +771,20 @@ main.o: main.cpp inputparser.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qvector.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qregion.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qdatastream.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qscopedpointer.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qiodevice.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qobject.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qcoreevent.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qmetatype.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qvarlengtharray.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qcontainerfwd.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qobject_impl.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qline.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qpainterpath.h
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qpainterpath.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qimageiohandler.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qplugin.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qpointer.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qsharedpointer.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qshareddata.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qhash.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qjsonobject.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qjsonvalue.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qfactoryinterface.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/QImage
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 vec3.o: vec3.cpp vec3.h
