@@ -15,7 +15,7 @@ CXX           = g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -fopenmp -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I. -I/home/gnuuser/Qt/5.10.1/gcc_64/include -I/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui -I/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/linux-g++
+INCPATH       = -I. -I. -I../assimp-v.5.0.0.rc1/include -I/home/gnuuser/Qt/5.10.1/gcc_64/include -I/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui -I/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore -I. -isystem /usr/include/libdrm -I/home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/gnuuser/Qt/5.10.1/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -38,7 +38,7 @@ DISTNAME      = MVORT1.0.0
 DISTDIR = /home/gnuuser/COLLEGE/CSCI3010/work/project/MVORT/.tmp/MVORT1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-rpath,/home/gnuuser/Qt/5.10.1/gcc_64/lib
-LIBS          = $(SUBLIBS) -fopenmp -L/home/gnuuser/Qt/5.10.1/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread 
+LIBS          = $(SUBLIBS) -fopenmp -L/home/gnuuser/COLLEGE/CSCI3010/work/project/MVORT/../assimp-v.5.0.0.rc1/lib/ -lassimp -L/home/gnuuser/Qt/5.10.1/gcc_64/lib -lQt5Gui -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -784,7 +784,36 @@ main.o: main.cpp inputparser.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qjsonobject.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qjsonvalue.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qfactoryinterface.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/QImage
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/QImage \
+		../assimp-v.5.0.0.rc1/include/assimp/postprocess.h \
+		../assimp-v.5.0.0.rc1/include/assimp/types.h \
+		../assimp-v.5.0.0.rc1/include/assimp/defs.h \
+		../assimp-v.5.0.0.rc1/include/assimp/config.h \
+		../assimp-v.5.0.0.rc1/include/assimp/vector3.h \
+		../assimp-v.5.0.0.rc1/include/assimp/vector2.h \
+		../assimp-v.5.0.0.rc1/include/assimp/color4.h \
+		../assimp-v.5.0.0.rc1/include/assimp/matrix3x3.h \
+		../assimp-v.5.0.0.rc1/include/assimp/matrix4x4.h \
+		../assimp-v.5.0.0.rc1/include/assimp/quaternion.h \
+		../assimp-v.5.0.0.rc1/include/assimp/vector2.inl \
+		../assimp-v.5.0.0.rc1/include/assimp/vector3.inl \
+		../assimp-v.5.0.0.rc1/include/assimp/color4.inl \
+		../assimp-v.5.0.0.rc1/include/assimp/quaternion.inl \
+		../assimp-v.5.0.0.rc1/include/assimp/matrix3x3.inl \
+		../assimp-v.5.0.0.rc1/include/assimp/matrix4x4.inl \
+		../assimp-v.5.0.0.rc1/include/assimp/Importer.hpp \
+		../assimp-v.5.0.0.rc1/include/assimp/scene.h \
+		../assimp-v.5.0.0.rc1/include/assimp/texture.h \
+		../assimp-v.5.0.0.rc1/include/assimp/Compiler/pushpack1.h \
+		../assimp-v.5.0.0.rc1/include/assimp/Compiler/poppack1.h \
+		../assimp-v.5.0.0.rc1/include/assimp/mesh.h \
+		../assimp-v.5.0.0.rc1/include/assimp/light.h \
+		../assimp-v.5.0.0.rc1/include/assimp/camera.h \
+		../assimp-v.5.0.0.rc1/include/assimp/material.h \
+		../assimp-v.5.0.0.rc1/include/assimp/material.inl \
+		../assimp-v.5.0.0.rc1/include/assimp/anim.h \
+		../assimp-v.5.0.0.rc1/include/assimp/metadata.h \
+		../assimp-v.5.0.0.rc1/include/assimp/Compiler/pstdint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 vec3.o: vec3.cpp vec3.h

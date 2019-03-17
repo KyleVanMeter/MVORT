@@ -6,23 +6,29 @@
 #include <vector>
 #include <stdlib.h>
 
+#include <cxxabi.h>
+
 int main(int argc, char **argv) {
 
   InputParser input(argc, argv);
   std::string filename;
+  bool isMeshUsed = false;
 
   if(input.CMDOptionExists("-h")) {
     std::cout << "Usage: MVORT [OPTION]\n \
 File output options:\n \
 -f [FILENAME.{ppm|jpg|png}]\n\n \
+Render options:\n \
+  Mesh input file:\n \
+-m [FILENAME.{obj}] \n\n\
 Help:\n \
 -h\n";
     return 0;
   } else if (input.CMDOptionExists("-f")) {
     std::string temp = input.getCMDOption("-f");
     filename = temp;
-    // TODO Do not read until end of line in case there are other arguments,
-    // find some other way of ending substr
+
+    //returned arguments are delineated by " "
     temp = temp.substr(temp.find(".") + 1, temp.size());
 
     if(temp != "png" && temp != "jpg" && temp != "ppm") {
@@ -35,6 +41,8 @@ Supported filetypes are:\n \
       return -1;
     }
 
+
+
     Render a(filename);
 
     a.setSampleRate(100);
@@ -42,8 +50,8 @@ Supported filetypes are:\n \
     a.setYResolution(400);
 
     a.setCameraPosition(Vec3(5, 1, 2));
-    a.setCameraTarget(Vec3(1, 0, -1));
-    a.setCameraAperature(0.15);
+    a.setCameraTarget(Vec3(1, 0, -5));
+    a.setCameraAperature(0.0);
     a.setCameraFocalDist(5.0);
     a.setCameraVFOV(50);
 
@@ -56,33 +64,49 @@ Supported filetypes are:\n \
     // hard-coding it in the render functionality itself
     std::vector<std::unique_ptr<Hitable>> scene;
 
+    if (input.CMDOptionExists("-m")) {
+      std::string meshFile = input.getCMDOption("-m");
+
+      // Just checking if it is empty for now as Assimp (should) support 40+
+      // formats.  So were going to let the library figure that one out
+      if (meshFile.empty()) {
+        std::cout << "Error: Unrecognized mesh filetype.\n \
+See Assimp documentation for supported filetypes.\n";
+
+        return -1;
+      }
+
+      Model modelObject = Model(meshFile);
+      modelObject.print();
+      // Mesh meshObject = Mesh(meshFile);
+      // std::vector<Triangle> meshTriangles = meshObject.getMeshTriangles();
+      // std::cout << meshTriangles.size() << "\n";
+      // std::cout << abi::__cxa_demangle(typeid(meshTriangles.at(1)).name(), 0, 0, 0) << "\n";
+
+      // std::vector<Vec3> coordinates = meshObject.getCoords();
+
+      // for(int i = 0; i < coordinates.size(); i+=3) {
+      //   scene.push_back(std::unique_ptr<Hitable>(new Triangle(
+      //       coordinates.at(i), coordinates.at(i + 1), coordinates.at(i + 2),
+      //       new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
+      // }
+    }
+
+
     std::string textureFile = "earthmap.jpg";
 
     Texture *checker =
         new CheckerBoard(new ConstantTexture(Vec3(0.5, 0.2, 0.1)),
                          new ConstantTexture(Vec3(0.9, 0.9, 0.9)));
 
-    scene.push_back(std::unique_ptr<Hitable>(new Triangle(
-        Vec3(0, 0, 0), Vec3(0, 1, 1), Vec3(0, 1, 2),
-        new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
-    scene.push_back(std::unique_ptr<Hitable>(new Triangle(
-        Vec3(0, 0, 0), Vec3(0, 0, 1), Vec3(0, 1, 2),
-        new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(0, 0, 0), 0.2,
-                   new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(0, 1, 1), 0.2,
-                   new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(0, 1, 2), 0.2,
-                   new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Vec3(0, 0, -1), 0.5,
     //                new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
+
     scene.push_back(std::unique_ptr<Hitable>(
         new Sphere(Vec3(0, -100.5, -1), 100,
                    new Lambertian(checker))));
+
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Vec3(0, 0, -2.75), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3))));
     // scene.push_back(std::unique_ptr<Hitable>(new Sphere(

@@ -19,6 +19,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 # Input
 HEADERS += camera.h hitable.h hitable_list.h material.h ray.h sphere.h vec3.h render.h triangle.h
-SOURCES += main.cpp vec3.cpp 
+SOURCES += main.cpp vec3.cpp
 QMAKE_CXXFLAGS += -fopenmp
 LIBS += -fopenmp
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../assimp-v.5.0.0.rc1/lib/release/ -lassimp
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../assimp-v.5.0.0.rc1/lib/debug/ -lassimp
+else:unix: LIBS += -L$$PWD/../assimp-v.5.0.0.rc1/lib/ -lassimp
+
+INCLUDEPATH += $$PWD/../assimp-v.5.0.0.rc1/include
+DEPENDPATH += $$PWD/../assimp-v.5.0.0.rc1/include
