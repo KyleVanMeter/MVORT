@@ -6,13 +6,10 @@
 #include <vector>
 #include <stdlib.h>
 
-#include <cxxabi.h>
-
 int main(int argc, char **argv) {
 
   InputParser input(argc, argv);
   std::string filename;
-  bool isMeshUsed = false;
 
   if(input.CMDOptionExists("-h")) {
     std::cout << "Usage: MVORT [OPTION]\n \
@@ -41,11 +38,9 @@ Supported filetypes are:\n \
       return -1;
     }
 
-
-
     Render a(filename);
 
-    a.setSampleRate(100);
+    a.setSampleRate(4000);
     a.setXResolution(800);
     a.setYResolution(400);
 
@@ -76,23 +71,35 @@ See Assimp documentation for supported filetypes.\n";
         return -1;
       }
 
-      Model modelObject = Model(meshFile);
-      modelObject.print();
-      // Mesh meshObject = Mesh(meshFile);
-      // std::vector<Triangle> meshTriangles = meshObject.getMeshTriangles();
-      // std::cout << meshTriangles.size() << "\n";
-      // std::cout << abi::__cxa_demangle(typeid(meshTriangles.at(1)).name(), 0, 0, 0) << "\n";
+      // TODO: Add support for textures, and materials from the imported data
+      Model modelObject(meshFile);
 
-      // std::vector<Vec3> coordinates = meshObject.getCoords();
+      //TODO: make this a reference (no copying large amount of data)
+      std::vector<Vec3> modelData = modelObject.getMeshData();
 
-      // for(int i = 0; i < coordinates.size(); i+=3) {
-      //   scene.push_back(std::unique_ptr<Hitable>(new Triangle(
-      //       coordinates.at(i), coordinates.at(i + 1), coordinates.at(i + 2),
-      //       new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
-      // }
+      // TODO: figure out a method for actually configuring the placing of the
+      // object in a scene.  Right now it only reads the vertices as they are
+      // relative to eachother (which is defined by assimp in some arcane way),
+      // so we need methods to transform the vertices at least with coordinate
+      // placement (say, the edge of the bounding box is at (x,z,y)), and at most
+      // rotation.
+      for(unsigned long i = 0; i < modelData.size(); i+=3) {
+
+        // the model data is represented here as a densely packed vector of
+        // Vec3's, where every 3 consecutive Vec3's (no offset) define a
+        // triangle.  Many formats (including wavefront .obj) support mesh face
+        // data for polygons, rather than just triangles, but the triangulation
+        // import option from assimp should work just fine.
+        Vec3 a = modelData.at(i + 0);
+        Vec3 b = modelData.at(i + 1);
+        Vec3 c = modelData.at(i + 2);
+
+        scene.push_back(std::unique_ptr<Hitable>(new Triangle(a, b, c, new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
+      }
     }
 
 
+    std::cout << "where1?" << "\n";
     std::string textureFile = "earthmap.jpg";
 
     Texture *checker =
@@ -103,9 +110,9 @@ See Assimp documentation for supported filetypes.\n";
     //     new Sphere(Vec3(0, 0, -1), 0.5,
     //                new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
 
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(0, -100.5, -1), 100,
-                   new Lambertian(checker))));
+    // scene.push_back(std::unique_ptr<Hitable>(
+    //     new Sphere(Vec3(0, -100.5, -1), 100,
+    //                new Lambertian(checker))));
 
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Vec3(0, 0, -2.75), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3))));
@@ -118,6 +125,9 @@ See Assimp documentation for supported filetypes.\n";
     scene.push_back(std::unique_ptr<Hitable>(
         new Sphere(Vec3(1, 4, -1), 1.5,
                    new DiffuseLight(new ConstantTexture(Vec3(3, 3, 3))))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Vec3(1, 6, -5), 1.5,
+                   new DiffuseLight(new ConstantTexture(Vec3(6, 3.5, 2))))));
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Vec3(4, 4, -3), 1.5,
     //                new DiffuseLight(new ConstantTexture(Vec3(2, 1, 5))))));

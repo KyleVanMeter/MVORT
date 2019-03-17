@@ -109,6 +109,7 @@ class Model {
     const aiScene *meshScene = importer.ReadFile(
         _meshFile, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices |
                        aiProcess_SortByPType | aiProcess_GenNormals);
+    _scene = meshScene;
     if (!meshScene || meshScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
         !meshScene->mRootNode) {
       std::cerr << "Assimp error: " << importer.GetErrorString() << std::endl;
@@ -122,23 +123,56 @@ class Model {
   void print() {
     Mesh printMe = _meshes.at(0);
 
-    std::cout << printMe._vertices.size() << "\n"
-              << printMe._indeces.size() << "\n";
+    std::cout << " mesh index: " << _scene->mMeshes[0]->mNumFaces
+              << ", mesh vertex: " << _scene->mMeshes[0]->mNumVertices
+              << ", mesh face: " << _scene->mMeshes[0]->mNumFaces << "\n";
 
-    for (unsigned long int i = 0; i < printMe._vertices.size(); i++) {
-      float x = printMe._vertices.at(i).position.x();
-      float y = printMe._vertices.at(i).position.y();
-      float z = printMe._vertices.at(i).position.z();
-
-      std::cout << "{" << x << ", " << y << ", " << z << "}, Index: " << printMe._indeces.at(i) << "\n";
+    std::cout << " index: " << printMe._indeces.size()
+              << ", vertex: " << printMe._vertices.size() << "\n";
+    for(unsigned long int i = 0; i < printMe._indeces.size(); i+=3) {
+      std::cout << "\n{"
+                << printMe._vertices.at(printMe._indeces.at(i + 0)).position
+                << "}, {"
+                << printMe._vertices.at(printMe._indeces.at(i + 1)).position
+                << "}, {"
+                << printMe._vertices.at(printMe._indeces.at(i + 2)).position
+                << "}\n";
     }
+
+    // for (unsigned long int i = 0; i < printMe._vertices.size(); i++) {
+    //   float x = printMe._vertices.at(i).position.x();
+    //   float y = printMe._vertices.at(i).position.y();
+    //   float z = printMe._vertices.at(i).position.z();
+
+    //   std::cout << "{" << x << ", " << y << ", " << z << "}, Index: " << printMe._indeces.at(i) << "\n";
+    // }
 
     // for(unsigned long int i = 0; i < printMe._indeces.size(); i++) {
     //   std::cout << "Index at " << i << ": " << printMe._indeces.at(i) << "\n";
     // }
   }
 
+  std::vector<Vec3> getMeshData() {
+
+    for (auto const& i : _meshes) {
+      std::cout << ", mesh size: " << _meshes.size() << "\n";
+      Mesh currentMesh = i;
+      for (unsigned long int j = 0; j < currentMesh._indeces.size(); j += 3) {
+        _meshData.push_back(
+            currentMesh._vertices.at(currentMesh._indeces.at(j + 0)).position);
+        _meshData.push_back(
+            currentMesh._vertices.at(currentMesh._indeces.at(j + 1)).position);
+        _meshData.push_back(
+            currentMesh._vertices.at(currentMesh._indeces.at(j + 2)).position);
+      }
+    }
+
+    std::cout << _meshData.size() << "\n";
+    return _meshData;
+  }
 private:
+  std::vector<Vec3> _meshData;
+  const aiScene *_scene;
   std::vector<Mesh> _meshes;
   std::string _meshFile;
 
