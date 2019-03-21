@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
+#include <chrono>
 
 int main(int argc, char **argv) {
 
@@ -98,8 +99,6 @@ See Assimp documentation for supported filetypes.\n";
       }
     }
 
-
-    std::cout << "where1?" << "\n";
     std::string textureFile = "earthmap.jpg";
 
     Texture *checker =
@@ -133,7 +132,14 @@ See Assimp documentation for supported filetypes.\n";
     //                new DiffuseLight(new ConstantTexture(Vec3(2, 1, 5))))));
     a.setScene(std::move(scene));
 
+    auto timeStart = std::chrono::high_resolution_clock::now();
     a.makeRender();
+    auto timeEnd = std::chrono::high_resolution_clock::now();
+
+    auto elapsedTime = timeEnd - timeStart;
+
+
+    std::cout << "Rendering took " << std::chrono::duration_cast<std::chrono::minutes>(elapsedTime).count() << " minutes." << std::endl;
 
   } else {
     std::cout << "Unrecognized option.\n \

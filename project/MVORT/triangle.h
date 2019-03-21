@@ -155,7 +155,6 @@ class Model {
   std::vector<Vec3> getMeshData() {
 
     for (auto const& i : _meshes) {
-      std::cout << ", mesh size: " << _meshes.size() << "\n";
       Mesh currentMesh = i;
       for (unsigned long int j = 0; j < currentMesh._indeces.size(); j += 3) {
         _meshData.push_back(
@@ -167,7 +166,6 @@ class Model {
       }
     }
 
-    std::cout << _meshData.size() << "\n";
     return _meshData;
   }
 private:
