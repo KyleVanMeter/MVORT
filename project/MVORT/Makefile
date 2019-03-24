@@ -50,10 +50,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = main.cpp \
-		vec3.cpp 
-OBJECTS       = main.o \
-		vec3.o
+SOURCES       = main.cpp 
+OBJECTS       = main.o
 DIST          = /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/spec_pre.prf \
 		/home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/common/unix.conf \
 		/home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/common/linux.conf \
@@ -241,10 +239,8 @@ DIST          = /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/spec_pre.prf \
 		material.h \
 		ray.h \
 		sphere.h \
-		vec3.h \
 		render.h \
-		triangle.h main.cpp \
-		vec3.cpp
+		triangle.h main.cpp
 QMAKE_TARGET  = MVORT
 DESTDIR       = 
 TARGET        = MVORT
@@ -640,8 +636,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /home/gnuuser/Qt/5.10.1/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents camera.h hitable.h hitable_list.h material.h ray.h sphere.h vec3.h render.h triangle.h $(DISTDIR)/
-	$(COPY_FILE) --parents main.cpp vec3.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents camera.h hitable.h hitable_list.h material.h ray.h sphere.h render.h triangle.h $(DISTDIR)/
+	$(COPY_FILE) --parents main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -694,10 +690,8 @@ main.o: main.cpp inputparser.h \
 		hitable_list.h \
 		hitable.h \
 		ray.h \
-		vec3.h \
 		sphere.h \
 		triangle.h \
-		camera.h \
 		material.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qimagereader.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/qtguiglobal.h \
@@ -784,8 +778,7 @@ main.o: main.cpp inputparser.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qjsonobject.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qjsonvalue.h \
 		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtCore/qfactoryinterface.h \
-		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/QImage \
-		../assimp-v.5.0.0.rc1/include/assimp/postprocess.h \
+		../assimp-v.5.0.0.rc1/include/assimp/Importer.hpp \
 		../assimp-v.5.0.0.rc1/include/assimp/types.h \
 		../assimp-v.5.0.0.rc1/include/assimp/defs.h \
 		../assimp-v.5.0.0.rc1/include/assimp/config.h \
@@ -801,7 +794,7 @@ main.o: main.cpp inputparser.h \
 		../assimp-v.5.0.0.rc1/include/assimp/quaternion.inl \
 		../assimp-v.5.0.0.rc1/include/assimp/matrix3x3.inl \
 		../assimp-v.5.0.0.rc1/include/assimp/matrix4x4.inl \
-		../assimp-v.5.0.0.rc1/include/assimp/Importer.hpp \
+		../assimp-v.5.0.0.rc1/include/assimp/postprocess.h \
 		../assimp-v.5.0.0.rc1/include/assimp/scene.h \
 		../assimp-v.5.0.0.rc1/include/assimp/texture.h \
 		../assimp-v.5.0.0.rc1/include/assimp/Compiler/pushpack1.h \
@@ -813,11 +806,10 @@ main.o: main.cpp inputparser.h \
 		../assimp-v.5.0.0.rc1/include/assimp/material.inl \
 		../assimp-v.5.0.0.rc1/include/assimp/anim.h \
 		../assimp-v.5.0.0.rc1/include/assimp/metadata.h \
-		../assimp-v.5.0.0.rc1/include/assimp/Compiler/pstdint.h
+		../assimp-v.5.0.0.rc1/include/assimp/Compiler/pstdint.h \
+		camera.h \
+		/home/gnuuser/Qt/5.10.1/gcc_64/include/QtGui/QImage
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
-
-vec3.o: vec3.cpp vec3.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o vec3.o vec3.cpp
 
 ####### Install
 
