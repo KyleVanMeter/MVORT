@@ -8,7 +8,6 @@
 #include <chrono>
 
 int main(int argc, char **argv) {
-
   InputParser input(argc, argv);
   std::string filename;
 
@@ -41,12 +40,12 @@ Supported filetypes are:\n \
 
     Render a(filename);
 
-    a.setSampleRate(4000);
+    a.setSampleRate(40);
     a.setXResolution(800);
     a.setYResolution(400);
 
-    a.setCameraPosition(Vec3(5, 1, 2));
-    a.setCameraTarget(Vec3(1, 0, -5));
+    a.setCameraPosition(Eigen::Vector3f(5, 1, 2));
+    a.setCameraTarget(Eigen::Vector3f(1, 0, -5));
     a.setCameraAperature(0.0);
     a.setCameraFocalDist(5.0);
     a.setCameraVFOV(50);
@@ -76,7 +75,7 @@ See Assimp documentation for supported filetypes.\n";
       Model modelObject(meshFile);
 
       //TODO: make this a reference (no copying large amount of data)
-      std::vector<Vec3> modelData = modelObject.getMeshData();
+      std::vector<Eigen::Vector3f> modelData = modelObject.getMeshData();
 
       // TODO: figure out a method for actually configuring the placing of the
       // object in a scene.  Right now it only reads the vertices as they are
@@ -87,49 +86,49 @@ See Assimp documentation for supported filetypes.\n";
       for(unsigned long i = 0; i < modelData.size(); i+=3) {
 
         // the model data is represented here as a densely packed vector of
-        // Vec3's, where every 3 consecutive Vec3's (no offset) define a
+        // vectors, where every 3 consecutive vectors (no offset) define a
         // triangle.  Many formats (including wavefront .obj) support mesh face
         // data for polygons, rather than just triangles, but the triangulation
         // import option from assimp should work just fine.
-        Vec3 a = modelData.at(i + 0);
-        Vec3 b = modelData.at(i + 1);
-        Vec3 c = modelData.at(i + 2);
+        Eigen::Vector3f a = modelData.at(i + 0);
+        Eigen::Vector3f b = modelData.at(i + 1);
+        Eigen::Vector3f c = modelData.at(i + 2);
 
-        scene.push_back(std::unique_ptr<Hitable>(new Triangle(a, b, c, new Lambertian(new ConstantTexture(Vec3(0.5, 0.5, 0.5))))));
+        scene.push_back(std::unique_ptr<Hitable>(new Triangle(a, b, c, new Lambertian(new ConstantTexture(Eigen::Vector3f(0.5, 0.5, 0.5))))));
       }
     }
 
     std::string textureFile = "earthmap.jpg";
 
     Texture *checker =
-        new CheckerBoard(new ConstantTexture(Vec3(0.5, 0.2, 0.1)),
-                         new ConstantTexture(Vec3(0.9, 0.9, 0.9)));
+        new CheckerBoard(new ConstantTexture(Eigen::Vector3f(0.5, 0.2, 0.1)),
+                         new ConstantTexture(Eigen::Vector3f(0.9, 0.9, 0.9)));
 
     // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Vec3(0, 0, -1), 0.5,
-    //                new Lambertian(new ConstantTexture(Vec3(0.1, 0.2, 0.5))))));
+    //     new Sphere(Eigen::Vector3f(0, 0, -1), 0.5,
+    //                new Lambertian(new ConstantTexture(Eigen::Vector3f(0.1, 0.2, 0.5))))));
 
     // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Vec3(0, -100.5, -1), 100,
+    //     new Sphere(Eigen::Vector3f(0, -100.5, -1), 100,
     //                new Lambertian(checker))));
 
     // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Vec3(0, 0, -2.75), 0.5, new Metal(Vec3(0.8, 0.6, 0.2), 0.3))));
+    //     new Sphere(Eigen::Vector3f(0, 0, -2.75), 0.5, new Metal(Eigen::Vector3f(0.8, 0.6, 0.2), 0.3))));
     // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-    //     Vec3(1, 0, -1), 0.5, new Lambertian(new ImageTexture(textureFile)))));
+    //     Eigen::Vector3f(1, 0, -1), 0.5, new Lambertian(new ImageTexture(textureFile)))));
     // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Vec3(1, 0, -2), 0.5, new Dielectic(1.5))));
+    //     new Sphere(Eigen::Vector3f(1, 0, -2), 0.5, new Dielectic(1.5))));
     // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Vec3(1, 0, -2), -0.45, new Dielectic(1.5))));
+    //     new Sphere(Eigen::Vector3f(1, 0, -2), -0.45, new Dielectic(1.5))));
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(1, 4, -1), 1.5,
-                   new DiffuseLight(new ConstantTexture(Vec3(3, 3, 3))))));
+        new Sphere(Eigen::Vector3f(1, 4, -1), 1.5,
+                   new DiffuseLight(new ConstantTexture(Eigen::Vector3f(3, 3, 3))))));
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Vec3(1, 6, -5), 1.5,
-                   new DiffuseLight(new ConstantTexture(Vec3(6, 3.5, 2))))));
+        new Sphere(Eigen::Vector3f(1, 6, -5), 1.5,
+                   new DiffuseLight(new ConstantTexture(Eigen::Vector3f(6, 3.5, 2))))));
     // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Vec3(4, 4, -3), 1.5,
-    //                new DiffuseLight(new ConstantTexture(Vec3(2, 1, 5))))));
+    //     new Sphere(Eigen::Vector3f(4, 4, -3), 1.5,
+    //                new DiffuseLight(new ConstantTexture(Eigen::Vector3f(2, 1, 5))))));
     a.setScene(std::move(scene));
 
     auto timeStart = std::chrono::high_resolution_clock::now();
