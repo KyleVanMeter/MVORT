@@ -119,41 +119,6 @@ class Model {
     }
 
     processNode(meshScene->mRootNode, meshScene);
-  }
-
-  void print() {
-    Mesh printMe = _meshes.at(0);
-
-    std::cout << " mesh index: " << _scene->mMeshes[0]->mNumFaces
-              << ", mesh vertex: " << _scene->mMeshes[0]->mNumVertices
-              << ", mesh face: " << _scene->mMeshes[0]->mNumFaces << "\n";
-
-    std::cout << " index: " << printMe._indeces.size()
-              << ", vertex: " << printMe._vertices.size() << "\n";
-    for(unsigned long int i = 0; i < printMe._indeces.size(); i+=3) {
-      std::cout << "\n{"
-                << printMe._vertices.at(printMe._indeces.at(i + 0)).position
-                << "}, {"
-                << printMe._vertices.at(printMe._indeces.at(i + 1)).position
-                << "}, {"
-                << printMe._vertices.at(printMe._indeces.at(i + 2)).position
-                << "}\n";
-    }
-
-    // for (unsigned long int i = 0; i < printMe._vertices.size(); i++) {
-    //   float x = printMe._vertices.at(i).position.x();
-    //   float y = printMe._vertices.at(i).position.y();
-    //   float z = printMe._vertices.at(i).position.z();
-
-    //   std::cout << "{" << x << ", " << y << ", " << z << "}, Index: " << printMe._indeces.at(i) << "\n";
-    // }
-
-    // for(unsigned long int i = 0; i < printMe._indeces.size(); i++) {
-    //   std::cout << "Index at " << i << ": " << printMe._indeces.at(i) << "\n";
-    // }
-  }
-
-  std::vector<Eigen::Vector3f> getMeshData() {
 
     for (auto const& i : _meshes) {
       Mesh currentMesh = i;
@@ -166,14 +131,54 @@ class Model {
             currentMesh._vertices.at(currentMesh._indeces.at(j + 2)).position);
       }
     }
+  }
 
+  void print() {
+  }
+
+  void setRelativePosition(Eigen::Vector3f input) {
+    setRotationTranslation(0.0, 0.0, 0.0, input);
+  }
+
+  void setRotation(float x, float y, float z) {
+    setRotationTranslation(x*M_PI, y*M_PI, z*M_PI, Eigen::Vector3f(0, 0, 0));
+  }
+
+  void setRotationTranslation(float x, float y, float z, Eigen::Vector3f tran) {
+    // TODO: figure out how homogenous coordinates work, and how to get
+    // world absolute (rather than relative) coordinates into the matrix
+    // currently this will move, and rotate your object in a sort of
+    // unintuitive way (movement is relative, so is rotation about an axis)
+    Eigen::Matrix4f rotMatrix = createAffineMatrix(x*M_PI, y*M_PI, z*M_PI, tran);
+    Eigen::Affine3f affineRotation;
+    affineRotation.matrix() = rotMatrix;
+
+    for(unsigned long i = 0; i < _meshData.size(); i+=3) {
+        _meshData.at(i + 0) = affineRotation * _meshData.at(i + 0);
+        _meshData.at(i + 1) = affineRotation * _meshData.at(i + 1);
+        _meshData.at(i + 2) = affineRotation * _meshData.at(i + 2);
+    }
+  }
+
+  std::vector<Eigen::Vector3f> getMeshData() {
     return _meshData;
   }
+
 private:
   std::vector<Eigen::Vector3f> _meshData;
   const aiScene *_scene;
   std::vector<Mesh> _meshes;
   std::string _meshFile;
+
+  Eigen::Matrix4f createAffineMatrix(float x, float y, float z, Eigen::Vector3f translationVector) {
+    Eigen::Transform<float, 3, Eigen::Affine> t;
+    t = Eigen::Translation<float, 3>(translationVector);
+    t.rotate(Eigen::AngleAxis<float>(x, Eigen::Vector3f::UnitX()));
+    t.rotate(Eigen::AngleAxis<float>(y, Eigen::Vector3f::UnitY()));
+    t.rotate(Eigen::AngleAxis<float>(z, Eigen::Vector3f::UnitZ()));
+
+    return t.matrix();
+  }
 
   void processNode(aiNode *node, const aiScene *scene) {
     for (uint i = 0; i < node->mNumMeshes; i++) {

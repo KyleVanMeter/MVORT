@@ -1,11 +1,12 @@
+
 #include "inputparser.h"
 #include "render.h"
 
-#include <memory>
-#include <iostream>
-#include <vector>
-#include <stdlib.h>
 #include <chrono>
+#include <iostream>
+#include <memory>
+#include <stdlib.h>
+#include <vector>
 
 int main(int argc, char **argv) {
   InputParser input(argc, argv);
@@ -40,11 +41,11 @@ Supported filetypes are:\n \
 
     Render a(filename);
 
-    a.setSampleRate(40);
+    a.setSampleRate(4);
     a.setXResolution(800);
     a.setYResolution(400);
 
-    a.setCameraPosition(Eigen::Vector3f(5, 1, 2));
+    a.setCameraPosition(Eigen::Vector3f(10, 2, 4));
     a.setCameraTarget(Eigen::Vector3f(1, 0, -5));
     a.setCameraAperature(0.0);
     a.setCameraFocalDist(5.0);
@@ -74,17 +75,10 @@ See Assimp documentation for supported filetypes.\n";
       // TODO: Add support for textures, and materials from the imported data
       Model modelObject(meshFile);
 
-      //TODO: make this a reference (no copying large amount of data)
+      modelObject.setRotationTranslation(0.0*M_PI, 0.0*M_PI, 0.0*M_PI, Eigen::Vector3f(-1,4,1));
       std::vector<Eigen::Vector3f> modelData = modelObject.getMeshData();
 
-      // TODO: figure out a method for actually configuring the placing of the
-      // object in a scene.  Right now it only reads the vertices as they are
-      // relative to eachother (which is defined by assimp in some arcane way),
-      // so we need methods to transform the vertices at least with coordinate
-      // placement (say, the edge of the bounding box is at (x,z,y)), and at most
-      // rotation.
       for(unsigned long i = 0; i < modelData.size(); i+=3) {
-
         // the model data is represented here as a densely packed vector of
         // vectors, where every 3 consecutive vectors (no offset) define a
         // triangle.  Many formats (including wavefront .obj) support mesh face
@@ -108,23 +102,23 @@ See Assimp documentation for supported filetypes.\n";
     //     new Sphere(Eigen::Vector3f(0, 0, -1), 0.5,
     //                new Lambertian(new ConstantTexture(Eigen::Vector3f(0.1, 0.2, 0.5))))));
 
-    // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Eigen::Vector3f(0, -100.5, -1), 100,
-    //                new Lambertian(checker))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Eigen::Vector3f(0, -500.5, -1), 500,
+                   new Lambertian(checker))));
 
-    // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Eigen::Vector3f(0, 0, -2.75), 0.5, new Metal(Eigen::Vector3f(0.8, 0.6, 0.2), 0.3))));
-    // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-    //     Eigen::Vector3f(1, 0, -1), 0.5, new Lambertian(new ImageTexture(textureFile)))));
-    // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Eigen::Vector3f(1, 0, -2), 0.5, new Dielectic(1.5))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Eigen::Vector3f(0, 1, -4.75), 2.5, new Metal(Eigen::Vector3f(0.8, 0.6, 0.2), 0.3))));
+    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+        Eigen::Vector3f(-4, 2, 1.5), 2.5, new Lambertian(new ImageTexture(textureFile)))));
+    scene.push_back(std::unique_ptr<Hitable>(
+         new Sphere(Eigen::Vector3f(2, 1.5, 0), 2.5, new Dielectic(1.5))));
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Eigen::Vector3f(1, 0, -2), -0.45, new Dielectic(1.5))));
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Eigen::Vector3f(1, 4, -1), 1.5,
+        new Sphere(Eigen::Vector3f(1, 10, -1), 1.5,
                    new DiffuseLight(new ConstantTexture(Eigen::Vector3f(3, 3, 3))))));
     scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Eigen::Vector3f(1, 6, -5), 1.5,
+        new Sphere(Eigen::Vector3f(1, 14, -5), 1.5,
                    new DiffuseLight(new ConstantTexture(Eigen::Vector3f(6, 3.5, 2))))));
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Eigen::Vector3f(4, 4, -3), 1.5,
