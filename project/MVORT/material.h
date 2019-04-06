@@ -1,8 +1,8 @@
 #ifndef __MATERIAL__
 #define __MATERIAL__
 
-#include "ray.h"
 #include "hitable.h"
+#include "ray.h"
 #include <QtGui/qimagereader.h>
 
 struct Hit_Record;
@@ -16,15 +16,19 @@ float schlick(float cosine, float ref_idx) {
 Eigen::Vector3f random_in_unit_sphere() {
   Eigen::Vector3f p;
   do {
-    p = 2.0 * Eigen::Vector3f(drand48(), drand48(), drand48()) - Eigen::Vector3f(1, 1, 1);
+    p = 2.0 * Eigen::Vector3f(drand48(), drand48(), drand48()) -
+        Eigen::Vector3f(1, 1, 1);
   } while (p.squaredNorm() >= 1.0);
 
   return p;
 }
 
-Eigen::Vector3f reflect(const Eigen::Vector3f &v, const Eigen::Vector3f &n) { return (v - 2 * v.dot(n) * n); }
+Eigen::Vector3f reflect(const Eigen::Vector3f &v, const Eigen::Vector3f &n) {
+  return (v - 2 * v.dot(n) * n);
+}
 
-bool refract(const Eigen::Vector3f &v, const Eigen::Vector3f &n, float ni_over_nt, Eigen::Vector3f &refracted) {
+bool refract(const Eigen::Vector3f &v, const Eigen::Vector3f &n,
+             float ni_over_nt, Eigen::Vector3f &refracted) {
   Eigen::Vector3f uv = v.normalized();
   float dt = uv.dot(n);
   float discriminant = 1.0 - ni_over_nt * ni_over_nt * (1 - dt * dt);
@@ -37,37 +41,39 @@ bool refract(const Eigen::Vector3f &v, const Eigen::Vector3f &n, float ni_over_n
 }
 
 class Texture {
- public:
-  virtual Eigen::Vector3f value(float u, float v, const Eigen::Vector3f &p) const = 0;
+public:
+  virtual Eigen::Vector3f value(float u, float v,
+                                const Eigen::Vector3f &p) const = 0;
 };
 
 class ConstantTexture : public Texture {
- public:
+public:
   ConstantTexture() {}
   ConstantTexture(Eigen::Vector3f c) : _color(c) {}
-  virtual Eigen::Vector3f value(float u, float v, const Eigen::Vector3f &p) const {
+  virtual Eigen::Vector3f value(float u, float v,
+                                const Eigen::Vector3f &p) const {
     return _color;
   }
 
- private:
+private:
   Eigen::Vector3f _color;
 };
 
 class CheckerBoard : public Texture {
- public:
+public:
   CheckerBoard() {}
   CheckerBoard(Texture *t0, Texture *t1) : _even(t0), _odd(t1) {}
-  virtual Eigen::Vector3f value(float u, float v, const Eigen::Vector3f &p) const {
+  virtual Eigen::Vector3f value(float u, float v,
+                                const Eigen::Vector3f &p) const {
     float pattern = sin(10 * p.x()) * sin(10 * p.y()) * sin(10 * p.z());
-    if(pattern < 0) {
+    if (pattern < 0) {
       return _odd->value(u, v, p);
     }
 
     return _even->value(u, v, p);
   }
 
-
- private:
+private:
   Texture *_even;
   Texture *_odd;
 };
@@ -86,7 +92,8 @@ public:
     _y = image.height();
   }
 
-  virtual Eigen::Vector3f value(float u, float v, const Eigen::Vector3f &p) const {
+  virtual Eigen::Vector3f value(float u, float v,
+                                const Eigen::Vector3f &p) const {
     int i = (u)*_x;
     int j = (1 - v) * _y - 0.001;
     if (i < 0)
@@ -114,7 +121,8 @@ class Material {
 public:
   virtual bool scatter(const Ray &r_in, const Hit_Record &rec,
                        Eigen::Vector3f &attenuation, Ray &scattered) const = 0;
-  virtual Eigen::Vector3f emitted(float u, float v, const Eigen::Vector3f &p) const {
+  virtual Eigen::Vector3f emitted(float u, float v,
+                                  const Eigen::Vector3f &p) const {
     return Eigen::Vector3f(0, 0, 0);
   }
 };
@@ -146,7 +154,8 @@ public:
   }
   virtual bool scatter(const Ray &r_in, const Hit_Record &rec,
                        Eigen::Vector3f &attenuation, Ray &scattered) const {
-    Eigen::Vector3f reflected = reflect(r_in.direction().normalized(), rec.normal);
+    Eigen::Vector3f reflected =
+        reflect(r_in.direction().normalized(), rec.normal);
     scattered = Ray(rec.p, reflected + fuzz * random_in_unit_sphere());
     attenuation = albedo;
     return (scattered.direction().dot(rec.normal) > 0);
@@ -157,47 +166,48 @@ public:
 };
 
 class Dielectic : public Material {
- public:
- Dielectic(float ri) : ref_idx(ri) {}
- virtual bool scatter(const Ray &r_in, const Hit_Record &rec, Eigen::Vector3f &attenuation,
-                      Ray &scattered) const {
-   Eigen::Vector3f outward_normal;
-   Eigen::Vector3f reflected = reflect(r_in.direction(), rec.normal);
-   float ni_over_nt;
-   attenuation = Eigen::Vector3f(1.0, 1.0, 1.0);
-   Eigen::Vector3f refracted;
-   float reflect_prob;
-   float cosine;
+public:
+  Dielectic(float ri) : ref_idx(ri) {}
+  virtual bool scatter(const Ray &r_in, const Hit_Record &rec,
+                       Eigen::Vector3f &attenuation, Ray &scattered) const {
+    Eigen::Vector3f outward_normal;
+    Eigen::Vector3f reflected = reflect(r_in.direction(), rec.normal);
+    float ni_over_nt;
+    attenuation = Eigen::Vector3f(1.0, 1.0, 1.0);
+    Eigen::Vector3f refracted;
+    float reflect_prob;
+    float cosine;
 
-   if(r_in.direction().dot(rec.normal) > 0) {
-     outward_normal = -rec.normal;
-     ni_over_nt = ref_idx;
+    if (r_in.direction().dot(rec.normal) > 0) {
+      outward_normal = -rec.normal;
+      ni_over_nt = ref_idx;
 
-     cosine = ref_idx + r_in.direction().dot(rec.normal) / r_in.direction().norm();
-   } else {
-     outward_normal = rec.normal;
-     ni_over_nt = 1.0 / ref_idx;
+      cosine =
+          ref_idx + r_in.direction().dot(rec.normal) / r_in.direction().norm();
+    } else {
+      outward_normal = rec.normal;
+      ni_over_nt = 1.0 / ref_idx;
 
-     cosine = -r_in.direction().dot(rec.normal) / r_in.direction().norm();
-   }
+      cosine = -r_in.direction().dot(rec.normal) / r_in.direction().norm();
+    }
 
-   if(refract(r_in.direction(), outward_normal, ni_over_nt, refracted)) {
-     reflect_prob = schlick(cosine, ref_idx);
-   } else {
-     scattered = Ray(rec.p, refracted);
-     reflect_prob = 1.0;
-   }
+    if (refract(r_in.direction(), outward_normal, ni_over_nt, refracted)) {
+      reflect_prob = schlick(cosine, ref_idx);
+    } else {
+      scattered = Ray(rec.p, refracted);
+      reflect_prob = 1.0;
+    }
 
-   if(drand48() < reflect_prob) {
-     scattered = Ray(rec.p, reflected);
-   } else {
-     scattered = Ray(rec.p, refracted);
-   }
+    if (drand48() < reflect_prob) {
+      scattered = Ray(rec.p, reflected);
+    } else {
+      scattered = Ray(rec.p, refracted);
+    }
 
-   return true;
- }
+    return true;
+  }
 
- float ref_idx;
+  float ref_idx;
 };
 
 class DiffuseLight : public Material {
@@ -207,7 +217,8 @@ public:
                        Eigen::Vector3f &attenuation, Ray &scattered) const {
     return false;
   }
-  virtual Eigen::Vector3f emitted(float u, float v, const Eigen::Vector3f &p) const {
+  virtual Eigen::Vector3f emitted(float u, float v,
+                                  const Eigen::Vector3f &p) const {
     return _emit->value(u, v, p);
   }
 

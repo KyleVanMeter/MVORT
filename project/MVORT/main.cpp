@@ -1,35 +1,53 @@
-
-#include "inputparser.h"
-#include "render.h"
-
 #include <chrono>
 #include <iostream>
 #include <memory>
 #include <stdlib.h>
 #include <vector>
 
+#include <qstringlist.h>
+#include <qstring.h>
+
+#include "inputparser.h"
+#include "render.h"
+
 int main(int argc, char **argv) {
   InputParser input(argc, argv);
   std::string filename;
 
-  if(input.CMDOptionExists("-h")) {
+  if (input.CMDOptionExists("-h")) {
     std::cout << "Usage: MVORT [OPTION]\n \
 File output options:\n \
 -f [FILENAME.{ppm|jpg|png}]\n\n \
 Render options:\n \
+  Sample rate:\n \
+-rsr [a]\n \
+  Resolution:\n \
+-rr [a]x[b]\n\n\
+  Camera options:\n \
+    Camera look from position:\n \
+-clf [x],[y],[z]\n \
+    Camera look at target:\n \
+-cla [x],[y],[z]\n\
+    Camera aperature:\n \
+-ca [a]\n \
+    Camera focal distance:\n \
+-cfd [a]\n \
+    Camera vertical FOV:\n \
+-cvfov [a]\n\n\
   Mesh input file:\n \
 -m [FILENAME.{obj}] \n\n\
-Help:\n \
+  Help:\n \
 -h\n";
+
     return 0;
   } else if (input.CMDOptionExists("-f")) {
     std::string temp = input.getCMDOption("-f");
     filename = temp;
 
-    //returned arguments are delineated by " "
+    // returned arguments are delineated by " "
     temp = temp.substr(temp.find(".") + 1, temp.size());
 
-    if(temp != "png" && temp != "jpg" && temp != "ppm") {
+    if (temp != "png" && temp != "jpg" && temp != "ppm") {
       std::cout << "Error: Unrecognized filetype.\n \
 Supported filetypes are:\n \
                         .png\n \
@@ -45,11 +63,97 @@ Supported filetypes are:\n \
     a.setXResolution(800);
     a.setYResolution(400);
 
+    if (input.CMDOptionExists("-rsr")) {
+      QString renSampleRate =
+          QString::fromStdString(input.getCMDOption("-rsr"));
+
+      if (renSampleRate.toInt() < 1) {
+        std::cout << "Error: Invalid sample rate.\n \
+       was " << renSampleRate.toInt()
+                  << ", must be \
+greater than 1.\n";
+
+        return -1;
+      }
+
+      a.setSampleRate(renSampleRate.toInt());
+    }
+
+    if (input.CMDOptionExists("-rr")) {
+      QString renResolution = QString::fromStdString(input.getCMDOption("-rr"));
+
+      QStringList resInt = renResolution.split("x");
+
+      if (resInt.length() != 2) {
+        std::cout << "Error: Render resolution argument mismatch,\n \
+       number of arguments was "
+                  << resInt.length() << ", must be 2.\n";
+
+        return -1;
+      }
+
+      a.setResolution(
+          std::make_pair<int, int>(resInt.at(0).toInt(), resInt.at(1).toInt()));
+    }
+
     a.setCameraPosition(Eigen::Vector3f(10, 2, 4));
     a.setCameraTarget(Eigen::Vector3f(1, 0, -5));
     a.setCameraAperature(0.0);
     a.setCameraFocalDist(5.0);
     a.setCameraVFOV(50);
+
+    if (input.CMDOptionExists("-clf")) {
+      QString camLookFromPos =
+          QString::fromStdString(input.getCMDOption("-clf"));
+      QStringList floatValue = camLookFromPos.split(",");
+
+      if (floatValue.length() != 3) {
+        std::cout << "Error: Camera LookFrom vector argument mismatch.\n \
+       number of arguments was "
+                  << floatValue.length() << ", must be 3.\n";
+
+        return -1;
+      }
+
+      a.setCameraPosition(Eigen::Vector3f(floatValue.at(0).toFloat(),
+                                          floatValue.at(1).toFloat(),
+                                          floatValue.at(2).toFloat()));
+    }
+
+    if (input.CMDOptionExists("-cla")) {
+      QString camLookAtPos = QString::fromStdString(input.getCMDOption("-cla"));
+      QStringList floatTarget = camLookAtPos.split(",");
+
+      if (floatTarget.length() != 3) {
+        std::cout << "Error: Camera LookAt vector argument mismatch.\n \
+       number of arguments was "
+                  << floatTarget.length() << ", must be 3.\n";
+
+        return -1;
+      }
+
+      a.setCameraTarget(Eigen::Vector3f(floatTarget.at(0).toFloat(),
+                                        floatTarget.at(1).toFloat(),
+                                        floatTarget.at(2).toFloat()));
+    }
+
+    if (input.CMDOptionExists("-ca")) {
+      QString camAperature = QString::fromStdString(input.getCMDOption("-ca"));
+
+      a.setCameraAperature(camAperature.toFloat());
+    }
+
+    if (input.CMDOptionExists("-cfd")) {
+      QString camFocalDist = QString::fromStdString(input.getCMDOption("-cfd"));
+
+      a.setCameraFocalDist(camFocalDist.toFloat());
+    }
+
+    if (input.CMDOptionExists("-cvfov")) {
+      QString camFOV = QString::fromStdString(input.getCMDOption("-cvfov"));
+
+      a.setCameraVFOV(camFOV.toInt());
+    }
 
     // To render we cannot simply pass a vector of Spheres, as we they are
     // derived from the abstract class Hitable (for instance how would we add a
@@ -75,10 +179,16 @@ See Assimp documentation for supported filetypes.\n";
       // TODO: Add support for textures, and materials from the imported data
       Model modelObject(meshFile);
 
-      modelObject.setRotationTranslation(0.0*M_PI, 0.0*M_PI, 0.0*M_PI, Eigen::Vector3f(-1,4,1));
+      modelObject.setRelativePosition(Eigen::Vector3f(-1, 4, 1));
+
+      // TODO: Make this actually work (maybe quarternions?)
+      std::cout << modelObject.getCenterOfMass() << std::endl;
+      modelObject.setActualRotation(67.0, 0.0, 0.0);
+      std::cout << modelObject.getCenterOfMass() << std::endl;
+
       std::vector<Eigen::Vector3f> modelData = modelObject.getMeshData();
 
-      for(unsigned long i = 0; i < modelData.size(); i+=3) {
+      for (unsigned long i = 0; i < modelData.size(); i += 3) {
         // the model data is represented here as a densely packed vector of
         // vectors, where every 3 consecutive vectors (no offset) define a
         // triangle.  Many formats (including wavefront .obj) support mesh face
@@ -88,7 +198,10 @@ See Assimp documentation for supported filetypes.\n";
         Eigen::Vector3f b = modelData.at(i + 1);
         Eigen::Vector3f c = modelData.at(i + 2);
 
-        scene.push_back(std::unique_ptr<Hitable>(new Triangle(a, b, c, new Lambertian(new ConstantTexture(Eigen::Vector3f(0.5, 0.5, 0.5))))));
+        scene.push_back(std::unique_ptr<Hitable>(
+            new Triangle(a, b, c,
+                         new Lambertian(new ConstantTexture(
+                             Eigen::Vector3f(0.5, 0.5, 0.5))))));
       }
     }
 
@@ -100,29 +213,34 @@ See Assimp documentation for supported filetypes.\n";
 
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Eigen::Vector3f(0, 0, -1), 0.5,
-    //                new Lambertian(new ConstantTexture(Eigen::Vector3f(0.1, 0.2, 0.5))))));
+    //                new Lambertian(new ConstantTexture(Eigen::Vector3f(0.1,
+    //                0.2, 0.5))))));
 
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Eigen::Vector3f(0, -500.5, -1), 500,
-                   new Lambertian(checker))));
+    //scene.push_back(std::unique_ptr<Hitable>(
+    //   new Sphere(Eigen::Vector3f(0, -500.5, -1), 500,
+    //              new Lambertian(checker))));
 
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Eigen::Vector3f(0, 1, -4.75), 2.5, new Metal(Eigen::Vector3f(0.8, 0.6, 0.2), 0.3))));
-    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-        Eigen::Vector3f(-4, 2, 1.5), 2.5, new Lambertian(new ImageTexture(textureFile)))));
-    scene.push_back(std::unique_ptr<Hitable>(
-         new Sphere(Eigen::Vector3f(2, 1.5, 0), 2.5, new Dielectic(1.5))));
+    // scene.push_back(std::unique_ptr<Hitable>(
+    //    new Sphere(Eigen::Vector3f(0, 1, -4.75), 2.5, new
+    //    Metal(Eigen::Vector3f(0.8, 0.6, 0.2), 0.3))));
+    // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+    //    Eigen::Vector3f(-4, 2, 1.5), 2.5, new Lambertian(new
+    //    ImageTexture(textureFile)))));
+    // scene.push_back(std::unique_ptr<Hitable>(
+    //     new Sphere(Eigen::Vector3f(2, 1.5, 0), 2.5, new Dielectic(1.5))));
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Eigen::Vector3f(1, 0, -2), -0.45, new Dielectic(1.5))));
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Eigen::Vector3f(1, 10, -1), 1.5,
-                   new DiffuseLight(new ConstantTexture(Eigen::Vector3f(3, 3, 3))))));
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Eigen::Vector3f(1, 14, -5), 1.5,
-                   new DiffuseLight(new ConstantTexture(Eigen::Vector3f(6, 3.5, 2))))));
+    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+        Eigen::Vector3f(1, 10, -1), 1.5,
+        new DiffuseLight(new ConstantTexture(Eigen::Vector3f(3, 3, 3))))));
+    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+        Eigen::Vector3f(1, 14, -5), 1.5,
+        new DiffuseLight(new ConstantTexture(Eigen::Vector3f(6, 3.5, 2))))));
+    scene.push_back(std::unique_ptr<Hitable>(new Triangle(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(5, 5, 5), Eigen::Vector3f(3,1,0), new Metal(Eigen::Vector3f(0.1,0.2,0.3), 0.5))));
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Eigen::Vector3f(4, 4, -3), 1.5,
-    //                new DiffuseLight(new ConstantTexture(Eigen::Vector3f(2, 1, 5))))));
+    //                new DiffuseLight(new ConstantTexture(Eigen::Vector3f(2, 1,
+    //                5))))));
     a.setScene(std::move(scene));
 
     auto timeStart = std::chrono::high_resolution_clock::now();
@@ -131,16 +249,14 @@ See Assimp documentation for supported filetypes.\n";
 
     auto elapsedTime = timeEnd - timeStart;
 
-
-    std::cout << "Rendering took " << std::chrono::duration_cast<std::chrono::minutes>(elapsedTime).count() << " minutes." << std::endl;
+    std::cout
+        << "Rendering took "
+        << std::chrono::duration_cast<std::chrono::minutes>(elapsedTime).count()
+        << " minutes." << std::endl;
 
   } else {
     std::cout << "Unrecognized option.\n \
-Usage: MVORT [OPTION]\n \
-File output options:\n \
--f [FILENAME.{ppm|jpg|png}]\n\n \
-Help:\n \
--h\n";
+See MVORT -h for usage details.\n1";
     return -1;
   }
 

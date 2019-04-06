@@ -4,22 +4,23 @@
 #include "hitable.h"
 #include "material.h"
 
-#include <typeinfo>
 #include <iostream>
+#include <typeinfo>
 
-#include <vector>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-
+#include <vector>
 
 class Triangle : public Hitable {
- public:
+public:
   Triangle() {}
- Triangle(Eigen::Vector3f v1, Eigen::Vector3f v2, Eigen::Vector3f v3, Material *a) : _vertex1(v1), _vertex2(v2), _vertex3(v3), mat_ptr(a) {};
+  Triangle(Eigen::Vector3f v1, Eigen::Vector3f v2, Eigen::Vector3f v3,
+           Material *a)
+      : _vertex1(v1), _vertex2(v2), _vertex3(v3), mat_ptr(a){};
   virtual bool hit(const Ray &r, float tmin, float tmax, Hit_Record &rec) const;
 
- private:
+private:
   Eigen::Vector3f _vertex1;
   Eigen::Vector3f _vertex2;
   Eigen::Vector3f _vertex3;
@@ -104,7 +105,7 @@ private:
 };
 
 class Model {
- public:
+public:
   Model(std::string &file) : _meshFile(file) {
     Assimp::Importer importer;
     const aiScene *meshScene = importer.ReadFile(
@@ -120,7 +121,7 @@ class Model {
 
     processNode(meshScene->mRootNode, meshScene);
 
-    for (auto const& i : _meshes) {
+    for (auto const &i : _meshes) {
       Mesh currentMesh = i;
       for (unsigned long int j = 0; j < currentMesh._indeces.size(); j += 3) {
         _meshData.push_back(
@@ -133,7 +134,72 @@ class Model {
     }
   }
 
-  void print() {
+  void print() {}
+
+  // Right now the object is rotated from the axis, regardless of
+  // where it is in the scene, thus making it unusable.  The idea
+  // of rotation is rotation the object itself (as if it were
+  // centered).  We are not going to go into arbitrary axis
+  // rotations as that sounds too damn complicated.  Instead the
+  // plan is:
+  //  1) Translate the center of the mesh to (0,0,0)
+  //  2) Do the rotation
+  //  3) Translate back to the original position
+  void setActualRotation(float x, float y, float z) {
+    Eigen::Vector3f originLoc = getCenterOfMass();
+    Eigen::Vector3f newLoc = -1.0 * originLoc;
+
+    setRotationTranslation(x, y, z, newLoc);
+    setRelativePosition(originLoc);
+  }
+
+  Eigen::Vector3f getCenterOfMass() {
+    float minX, maxX, maxY, minY, maxZ, minZ;
+
+    std::vector<Eigen::Vector3f>::iterator iter_minX = std::min_element(
+        _meshData.begin(), _meshData.end(),
+        [](const Eigen::Vector3f &a, const Eigen::Vector3f &b) -> bool {
+          return a.x() < b.x();
+        });
+    std::vector<Eigen::Vector3f>::iterator iter_maxX = std::max_element(
+        _meshData.begin(), _meshData.end(),
+        [](const Eigen::Vector3f &a, const Eigen::Vector3f &b) -> bool {
+          return a.x() > b.x();
+        });
+    minX = iter_minX->x();
+    maxX = iter_maxX->x();
+
+    std::vector<Eigen::Vector3f>::iterator iter_minY = std::min_element(
+        _meshData.begin(), _meshData.end(),
+        [](const Eigen::Vector3f &a, const Eigen::Vector3f &b) -> bool {
+          return a.y() < b.y();
+        });
+    std::vector<Eigen::Vector3f>::iterator iter_maxY = std::max_element(
+        _meshData.begin(), _meshData.end(),
+        [](const Eigen::Vector3f &a, const Eigen::Vector3f &b) -> bool {
+          return a.y() > b.y();
+        });
+    minY = iter_minY->y();
+    maxY = iter_maxY->y();
+
+    std::vector<Eigen::Vector3f>::iterator iter_minZ = std::min_element(
+        _meshData.begin(), _meshData.end(),
+        [](const Eigen::Vector3f &a, const Eigen::Vector3f &b) -> bool {
+          return a.z() < b.z();
+        });
+    std::vector<Eigen::Vector3f>::iterator iter_maxZ = std::max_element(
+        _meshData.begin(), _meshData.end(),
+        [](const Eigen::Vector3f &a, const Eigen::Vector3f &b) -> bool {
+          return a.z() > b.z();
+        });
+    minZ = iter_minZ->z();
+    maxZ = iter_maxZ->z();
+
+    float y = (minY + maxY) / 2.0;
+    float x = (minX + maxX) / 2.0;
+    float z = (minZ + maxZ) / 2.0;
+
+    return Eigen::Vector3f(x, y, z);
   }
 
   void setRelativePosition(Eigen::Vector3f input) {
@@ -141,7 +207,7 @@ class Model {
   }
 
   void setRotation(float x, float y, float z) {
-    setRotationTranslation(x*M_PI, y*M_PI, z*M_PI, Eigen::Vector3f(0, 0, 0));
+    setRotationTranslation(x, y, z, Eigen::Vector3f(0, 0, 0));
   }
 
   void setRotationTranslation(float x, float y, float z, Eigen::Vector3f tran) {
@@ -149,20 +215,20 @@ class Model {
     // world absolute (rather than relative) coordinates into the matrix
     // currently this will move, and rotate your object in a sort of
     // unintuitive way (movement is relative, so is rotation about an axis)
-    Eigen::Matrix4f rotMatrix = createAffineMatrix(x*M_PI, y*M_PI, z*M_PI, tran);
+    Eigen::Matrix4f rotMatrix =
+        createAffineMatrix(x * M_PI, y * M_PI, z * M_PI, tran);
     Eigen::Affine3f affineRotation;
     affineRotation.matrix() = rotMatrix;
 
-    for(unsigned long i = 0; i < _meshData.size(); i+=3) {
-        _meshData.at(i + 0) = affineRotation * _meshData.at(i + 0);
-        _meshData.at(i + 1) = affineRotation * _meshData.at(i + 1);
-        _meshData.at(i + 2) = affineRotation * _meshData.at(i + 2);
+    std::cout << rotMatrix << std::endl;
+    for (unsigned long i = 0; i < _meshData.size(); i += 3) {
+      _meshData.at(i + 0) = affineRotation.linear() * _meshData.at(i + 0);
+      _meshData.at(i + 1) = affineRotation.linear() * _meshData.at(i + 1);
+      _meshData.at(i + 2) = affineRotation.linear() * _meshData.at(i + 2);
     }
   }
 
-  std::vector<Eigen::Vector3f> getMeshData() {
-    return _meshData;
-  }
+  std::vector<Eigen::Vector3f> getMeshData() { return _meshData; }
 
 private:
   std::vector<Eigen::Vector3f> _meshData;
@@ -170,7 +236,8 @@ private:
   std::vector<Mesh> _meshes;
   std::string _meshFile;
 
-  Eigen::Matrix4f createAffineMatrix(float x, float y, float z, Eigen::Vector3f translationVector) {
+  Eigen::Matrix4f createAffineMatrix(float x, float y, float z,
+                                     Eigen::Vector3f translationVector) {
     Eigen::Transform<float, 3, Eigen::Affine> t;
     t = Eigen::Translation<float, 3>(translationVector);
     t.rotate(Eigen::AngleAxis<float>(x, Eigen::Vector3f::UnitX()));
@@ -186,7 +253,7 @@ private:
       _meshes.push_back(processMesh(mesh, scene));
     }
 
-    for(uint i = 0; i < node->mNumChildren; i++) {
+    for (uint i = 0; i < node->mNumChildren; i++) {
       processNode(node->mChildren[i], scene);
     }
   }
@@ -196,20 +263,20 @@ private:
     std::vector<uint> index;
     std::vector<TexturesType> textures;
 
-    for(uint i = 0; i < mesh->mNumVertices; i++) {
+    for (uint i = 0; i < mesh->mNumVertices; i++) {
       Vertex vertex;
 
       Eigen::Vector3f pos(mesh->mVertices[i].x, mesh->mVertices[i].y,
-               mesh->mVertices[i].z);
+                          mesh->mVertices[i].z);
 
       vertex.position = pos;
 
       Eigen::Vector3f nom(mesh->mNormals[i].x, mesh->mNormals[i].y,
-               mesh->mNormals[i].z);
+                          mesh->mNormals[i].z);
 
       vertex.normal = nom;
 
-      if(mesh->mTextureCoords[0]) {
+      if (mesh->mTextureCoords[0]) {
         vertex.u = mesh->mTextureCoords[0][i].x;
         vertex.v = mesh->mTextureCoords[0][i].y;
       } else {
@@ -220,10 +287,10 @@ private:
       verteces.push_back(vertex);
     }
 
-    for(uint i = 0; i < mesh->mNumFaces; i++) {
+    for (uint i = 0; i < mesh->mNumFaces; i++) {
       aiFace face = mesh->mFaces[i];
 
-      for(uint j = 0; j < face.mNumIndices; j++) {
+      for (uint j = 0; j < face.mNumIndices; j++) {
         index.push_back(face.mIndices[j]);
       }
     }

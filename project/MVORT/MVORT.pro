@@ -29,3 +29,7 @@ else:unix: LIBS += -L$$PWD/../assimp-v.5.0.0.rc1/lib/ -lassimp
 
 INCLUDEPATH += $$PWD/../assimp-v.5.0.0.rc1/include
 DEPENDPATH += $$PWD/../assimp-v.5.0.0.rc1/include
+
+DISTFILES += \
+    TestForm.ui.qml \
+    Test.qml
