@@ -113,6 +113,7 @@ public:
 private:
   QImage *_Render();
   Eigen::Vector3f color(const Ray &r, Hitable *world, int depth);
+  Eigen::Vector3f oldColor(const Ray &r, Hitable *world);
 
   Hitable *_world;
   Camera *_cam;
@@ -136,6 +137,19 @@ void Render::setScene(std::vector<std::unique_ptr<Hitable>> sceneDescription) {
   }
 
   _world = new Hitable_List(list, k);
+}
+
+Eigen::Vector3f Render::oldColor(const Ray &r, Hitable *world) {
+  Hit_Record rec;
+  if(world->hit(r, 0.001, MAXFLOAT, rec)) {
+    Eigen::Vector3f target = rec.p + rec.normal;
+    return 0.5 * oldColor(Ray(rec.p, rec.normal), world);
+  } else {
+    Eigen::Vector3f unit_direction = r.direction().normalized();
+    float t = 0.5 * (unit_direction.y() + 1.0);
+
+    return (1.0 - t) * Eigen::Vector3f(1.0, 1.0, 1.0) + t * Eigen::Vector3f(0.5, 0.7, 0.5);
+  }
 }
 
 Eigen::Vector3f Render::color(const Ray &r, Hitable *world, int depth) {
@@ -199,7 +213,7 @@ QImage *Render::_Render() {
         float v = float(j + drand48()) / float(ny);
         Ray r = cam.get_ray(u, v);
         Eigen::Vector3f p = r.point_at_parameter(2.0);
-        col += color(r, _world, 0);
+        col += oldColor(r, _world);
       }
 
       col /= float(_sampleRate);

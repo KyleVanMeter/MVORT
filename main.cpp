@@ -183,7 +183,7 @@ See Assimp documentation for supported filetypes.\n";
 
       // TODO: Make this actually work (maybe quarternions?)
       std::cout << modelObject.getCenterOfMass() << std::endl;
-      modelObject.setActualRotation(67.0, 0.0, 0.0);
+      modelObject.setActualRotation(0.0, 90.0, 0.0);
       std::cout << modelObject.getCenterOfMass() << std::endl;
 
       std::vector<Eigen::Vector3f> modelData = modelObject.getMeshData();
@@ -211,14 +211,14 @@ See Assimp documentation for supported filetypes.\n";
         new CheckerBoard(new ConstantTexture(Eigen::Vector3f(0.5, 0.2, 0.1)),
                          new ConstantTexture(Eigen::Vector3f(0.9, 0.9, 0.9)));
 
-    // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Eigen::Vector3f(0, 0, -1), 0.5,
-    //                new Lambertian(new ConstantTexture(Eigen::Vector3f(0.1,
-    //                0.2, 0.5))))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Eigen::Vector3f(0, 0, -1), 0.5,
+                   new Lambertian(new ConstantTexture(Eigen::Vector3f(0.1,
+                   0.5, 0.6))))));
 
-    //scene.push_back(std::unique_ptr<Hitable>(
-    //   new Sphere(Eigen::Vector3f(0, -500.5, -1), 500,
-    //              new Lambertian(checker))));
+    scene.push_back(std::unique_ptr<Hitable>(
+       new Sphere(Eigen::Vector3f(0, -500.5, -1), 500,
+                  new Lambertian(checker))));
 
     // scene.push_back(std::unique_ptr<Hitable>(
     //    new Sphere(Eigen::Vector3f(0, 1, -4.75), 2.5, new
@@ -230,13 +230,13 @@ See Assimp documentation for supported filetypes.\n";
     //     new Sphere(Eigen::Vector3f(2, 1.5, 0), 2.5, new Dielectic(1.5))));
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Eigen::Vector3f(1, 0, -2), -0.45, new Dielectic(1.5))));
-    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-        Eigen::Vector3f(1, 10, -1), 1.5,
-        new DiffuseLight(new ConstantTexture(Eigen::Vector3f(3, 3, 3))))));
-    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-        Eigen::Vector3f(1, 14, -5), 1.5,
-        new DiffuseLight(new ConstantTexture(Eigen::Vector3f(6, 3.5, 2))))));
-    scene.push_back(std::unique_ptr<Hitable>(new Triangle(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(5, 5, 5), Eigen::Vector3f(3,1,0), new Metal(Eigen::Vector3f(0.1,0.2,0.3), 0.5))));
+    // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+    //     Eigen::Vector3f(1, 10, -1), 1.5,
+    //     new DiffuseLight(new ConstantTexture(Eigen::Vector3f(3, 3, 3))))));
+    // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+    //     Eigen::Vector3f(1, 14, -5), 1.5,
+    //     new DiffuseLight(new ConstantTexture(Eigen::Vector3f(6, 3.5, 2))))));
+    // scene.push_back(std::unique_ptr<Hitable>(new Triangle(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(5, 5, 5), Eigen::Vector3f(3,1,0), new Metal(Eigen::Vector3f(0.1,0.2,0.3), 0.5))));
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Eigen::Vector3f(4, 4, -3), 1.5,
     //                new DiffuseLight(new ConstantTexture(Eigen::Vector3f(2, 1,
