@@ -193,7 +193,6 @@ QImage *Render::_Render() {
                    " resolution.\n";
 
   QImage *image = new QImage(nx, ny, QImage::Format::Format_RGB32);
-  QRgb pixel;
 
   Camera cam(_camPos, _camTarget, _camRoll, _vFOV, float(nx) / float(ny),
              _aperature, _focal, _time0, _time1);
@@ -201,7 +200,9 @@ QImage *Render::_Render() {
   int count = 0;
 
 #pragma omp parallel for
-  for (int j = ny - 1; j >= 0; j--) {
+//  for (int j = ny - 1; j >= 0; j--) {
+  for (int j = 0; j < ny; j++) {
+    QRgb *line = (QRgb*)image->scanLine(j);
     for (int i = 0; i < nx; i++) {
 
       count++;
@@ -212,7 +213,6 @@ QImage *Render::_Render() {
         float u = float(i + drand48()) / float(nx);
         float v = float(j + drand48()) / float(ny);
         Ray r = cam.get_ray(u, v);
-        Eigen::Vector3f p = r.point_at_parameter(2.0);
         col += oldColor(r, _world);
       }
 
@@ -220,13 +220,12 @@ QImage *Render::_Render() {
       col = Eigen::Vector3f(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
 
       Eigen::Vector3f rgb = 255.99 * col;
-      // TODO: do not use setPixel frequently.  Look into replacing it with
-      // bit-level manipulation for extra speed
-      pixel = qRgb(rgb.x(), rgb.y(), rgb.z());
-      image->setPixel(i, -1 * (j - ny + 1), pixel);
+
+      line[i] = qRgb(rgb.x(), rgb.y(), rgb.z());
     }
   }
 
+  *image = image->mirrored(false, true);
   return (image);
 }
 
