@@ -3,7 +3,7 @@
 
 #include "ray.h"
 
-Eigen::Vector3f random_in_unit_disk() {
+inline Eigen::Vector3f random_in_unit_disk() {
   Eigen::Vector3f p;
   do {
     p = 2.0 * Eigen::Vector3f(drand48(), drand48(), 0) -

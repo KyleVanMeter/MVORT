@@ -27,7 +27,7 @@ private:
   Material *mat_ptr;
 };
 
-bool Triangle::hit(const Ray &r, float t_min, float t_max,
+inline bool Triangle::hit(const Ray &r, float t_min, float t_max,
                    Hit_Record &rec) const {
   const float epsilon = 0.0000001;
 

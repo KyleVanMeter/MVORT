@@ -3,15 +3,28 @@
 #include <memory>
 #include <stdlib.h>
 #include <vector>
+#include <QDebug>
 
-#include <qstringlist.h>
+//Gui headers
+#include "appmain.h"
+#include <QApplication>
+#include <QMainWindow>
+
 #include <qstring.h>
+#include <qstringlist.h>
 
+//Rendering headers
+#include "options.h"
 #include "inputparser.h"
 #include "render.h"
 
 int main(int argc, char **argv) {
+  QApplication app(argc, argv);
+  QMainWindow w;
   InputParser input(argc, argv);
+  Options optionObject;
+
+  //AppMain client;
   std::string filename;
 
   if (input.CMDOptionExists("-h")) {
@@ -57,11 +70,11 @@ Supported filetypes are:\n \
       return -1;
     }
 
-    Render a(filename);
-
-    a.setSampleRate(4);
-    a.setXResolution(800);
-    a.setYResolution(400);
+    //Render a(filename);
+    optionObject.filename = filename;
+    optionObject.xRes = 800;
+    optionObject.yRes = 800;
+    optionObject.sampleRate = 3;
 
     if (input.CMDOptionExists("-rsr")) {
       QString renSampleRate =
@@ -76,7 +89,8 @@ greater than 1.\n";
         return -1;
       }
 
-      a.setSampleRate(renSampleRate.toInt());
+      //a.setSampleRate(renSampleRate.toInt());
+      optionObject.sampleRate = renSampleRate.toInt();
     }
 
     if (input.CMDOptionExists("-rr")) {
@@ -92,15 +106,23 @@ greater than 1.\n";
         return -1;
       }
 
-      a.setResolution(
-          std::make_pair<int, int>(resInt.at(0).toInt(), resInt.at(1).toInt()));
+      //a.setResolution(
+      //    std::make_pair<int, int>(resInt.at(0).toInt(), resInt.at(1).toInt()));
+      optionObject.xRes = resInt.at(0).toInt();
+      optionObject.yRes = resInt.at(1).toInt();
     }
 
-    a.setCameraPosition(Eigen::Vector3f(10, 2, 4));
-    a.setCameraTarget(Eigen::Vector3f(1, 0, -5));
-    a.setCameraAperature(0.0);
-    a.setCameraFocalDist(5.0);
-    a.setCameraVFOV(50);
+    //a.setCameraPosition(Eigen::Vector3f(10, 2, 4));
+    //a.setCameraTarget(Eigen::Vector3f(1, 0, -5));
+    //a.setCameraAperature(0.0);
+    //a.setCameraFocalDist(5.0);
+    //a.setCameraVFOV(50);
+
+    optionObject.camPos = Eigen::Vector3f(10, 2, 4);
+    optionObject.camTarget = Eigen::Vector3f(1, 0, -5);
+    optionObject.aperature = 0.0;
+    optionObject.focal = 5.0;
+    optionObject.vFOV = 50;
 
     if (input.CMDOptionExists("-clf")) {
       QString camLookFromPos =
@@ -115,9 +137,13 @@ greater than 1.\n";
         return -1;
       }
 
-      a.setCameraPosition(Eigen::Vector3f(floatValue.at(0).toFloat(),
-                                          floatValue.at(1).toFloat(),
-                                          floatValue.at(2).toFloat()));
+      //a.setCameraPosition(Eigen::Vector3f(floatValue.at(0).toFloat(),
+      //                                    floatValue.at(1).toFloat(),
+      //                                    floatValue.at(2).toFloat()));
+
+      optionObject.camPos = Eigen::Vector3f(floatValue.at(0).toFloat(),
+                                            floatValue.at(1).toFloat(),
+                                            floatValue.at(2).toFloat());
     }
 
     if (input.CMDOptionExists("-cla")) {
@@ -132,27 +158,33 @@ greater than 1.\n";
         return -1;
       }
 
-      a.setCameraTarget(Eigen::Vector3f(floatTarget.at(0).toFloat(),
-                                        floatTarget.at(1).toFloat(),
-                                        floatTarget.at(2).toFloat()));
+      //a.setCameraTarget(Eigen::Vector3f(floatTarget.at(0).toFloat(),
+      //                                  floatTarget.at(1).toFloat(),
+      //                                  floatTarget.at(2).toFloat()));
+      optionObject.camTarget = Eigen::Vector3f(floatTarget.at(0).toFloat(),
+                                               floatTarget.at(1).toFloat(),
+                                               floatTarget.at(2).toFloat());
     }
 
     if (input.CMDOptionExists("-ca")) {
       QString camAperature = QString::fromStdString(input.getCMDOption("-ca"));
 
-      a.setCameraAperature(camAperature.toFloat());
+      //a.setCameraAperature(camAperature.toFloat());
+      optionObject.aperature = camAperature.toFloat();
     }
 
     if (input.CMDOptionExists("-cfd")) {
       QString camFocalDist = QString::fromStdString(input.getCMDOption("-cfd"));
 
-      a.setCameraFocalDist(camFocalDist.toFloat());
+      //a.setCameraFocalDist(camFocalDist.toFloat());
+      optionObject.focal = camFocalDist.toFloat();
     }
 
     if (input.CMDOptionExists("-cvfov")) {
       QString camFOV = QString::fromStdString(input.getCMDOption("-cvfov"));
 
-      a.setCameraVFOV(camFOV.toInt());
+      //a.setCameraVFOV(camFOV.toInt());
+      optionObject.vFOV = camFOV.toInt();
     }
 
     // To render we cannot simply pass a vector of Spheres, as we they are
@@ -198,6 +230,10 @@ See Assimp documentation for supported filetypes.\n";
         Eigen::Vector3f b = modelData.at(i + 1);
         Eigen::Vector3f c = modelData.at(i + 2);
 
+        //optionObject.scene.push_back(std::unique_ptr<Hitable>(
+        //    new Triangle(a, b, c,
+        //                 new Lambertian(new ConstantTexture(
+        //                     Eigen::Vector3f(0.5, 0.5, 0.5))))));
         scene.push_back(std::unique_ptr<Hitable>(
             new Triangle(a, b, c,
                          new Lambertian(new ConstantTexture(
@@ -211,14 +247,18 @@ See Assimp documentation for supported filetypes.\n";
         new CheckerBoard(new ConstantTexture(Eigen::Vector3f(0.5, 0.2, 0.1)),
                          new ConstantTexture(Eigen::Vector3f(0.9, 0.9, 0.9)));
 
-    scene.push_back(std::unique_ptr<Hitable>(
-        new Sphere(Eigen::Vector3f(0, 0, -1), 0.5,
-                   new Lambertian(new ConstantTexture(Eigen::Vector3f(0.1,
-                   0.5, 0.6))))));
 
-    scene.push_back(std::unique_ptr<Hitable>(
-       new Sphere(Eigen::Vector3f(0, -500.5, -1), 500,
-                  new Lambertian(checker))));
+    //optionObject.scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+    //    Eigen::Vector3f(0, 0, -1), 0.5,
+    //    new Lambertian(new ConstantTexture(Eigen::Vector3f(0.1, 0.5, 0.6))))));
+    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+        Eigen::Vector3f(0, 0, -1), 0.5,
+        new Lambertian(new ConstantTexture(Eigen::Vector3f(0.1, 0.5, 0.6))))));
+
+    //optionObject.scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+    //    Eigen::Vector3f(0, -500.5, -1), 500, new Lambertian(checker))));
+    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+        Eigen::Vector3f(0, -500.5, -1), 500, new Lambertian(checker))));
 
     // scene.push_back(std::unique_ptr<Hitable>(
     //    new Sphere(Eigen::Vector3f(0, 1, -4.75), 2.5, new
@@ -236,23 +276,31 @@ See Assimp documentation for supported filetypes.\n";
     // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
     //     Eigen::Vector3f(1, 14, -5), 1.5,
     //     new DiffuseLight(new ConstantTexture(Eigen::Vector3f(6, 3.5, 2))))));
-    // scene.push_back(std::unique_ptr<Hitable>(new Triangle(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(5, 5, 5), Eigen::Vector3f(3,1,0), new Metal(Eigen::Vector3f(0.1,0.2,0.3), 0.5))));
+    // scene.push_back(std::unique_ptr<Hitable>(new Triangle(Eigen::Vector3f(0,
+    // 0, 0), Eigen::Vector3f(5, 5, 5), Eigen::Vector3f(3,1,0), new
+    // Metal(Eigen::Vector3f(0.1,0.2,0.3), 0.5))));
     // scene.push_back(std::unique_ptr<Hitable>(
     //     new Sphere(Eigen::Vector3f(4, 4, -3), 1.5,
     //                new DiffuseLight(new ConstantTexture(Eigen::Vector3f(2, 1,
     //                5))))));
-    a.setScene(std::move(scene));
+    //a.setScene(std::move(scene));
 
+
+    qDebug() << "before AppMain\n opt xRes: " << optionObject.xRes << "\n scene size: " << scene.size() << "\n";
+    AppMain *main = new AppMain(std::move(scene), &optionObject, &w);
+    //AppMain main;
+    w.setCentralWidget(main);
+    w.show();
     auto timeStart = std::chrono::high_resolution_clock::now();
-    a.makeRender();
+    //a.makeRender();
     auto timeEnd = std::chrono::high_resolution_clock::now();
 
     auto elapsedTime = timeEnd - timeStart;
 
-    std::cout
-        << "Rendering took "
-        << std::chrono::duration_cast<std::chrono::minutes>(elapsedTime).count()
-        << " minutes." << std::endl;
+    //std::cout
+    //    << "Rendering took "
+    //    << std::chrono::duration_cast<std::chrono::minutes>(elapsedTime).count()
+    //    << " minutes." << std::endl;
 
   } else {
     std::cout << "Unrecognized option.\n \
@@ -260,5 +308,5 @@ See MVORT -h for usage details.\n1";
     return -1;
   }
 
-  return 0;
+  return app.exec();
 }

@@ -14,7 +14,7 @@ public:
   Material *mat_ptr;
 };
 
-bool Sphere::hit(const Ray &r, float t_min, float t_max,
+inline bool Sphere::hit(const Ray &r, float t_min, float t_max,
                  Hit_Record &rec) const {
   Eigen::Vector3f oc = r.origin() - center;
   float a = r.direction().dot(r.direction());
@@ -65,7 +65,7 @@ public:
   Material *mat_ptr;
 };
 
-bool Moving_Sphere::hit(const Ray &r, float tmin, float tmax,
+inline bool Moving_Sphere::hit(const Ray &r, float tmin, float tmax,
                         Hit_Record &rec) const {
   Eigen::Vector3f oc = r.origin() - center(r.time());
   float a = r.direction().dot(r.direction());

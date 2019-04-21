@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __HITABLE__
 #define __HITABLE__
 
@@ -7,7 +9,7 @@ class Material;
 
 // transforms from a texture coordinate to a spherical coordinate
 // also known as UV mapping on a sphere
-void getSphereCoords(const Eigen::Vector3f &p, float &u, float &v) {
+inline void getSphereCoords(const Eigen::Vector3f &p, float &u, float &v) {
   /* u = 1 - (atan2(p.z(), p.x()) + M_PI) / (2 * M_PI); */
   /* v = (asin(p.y()) + M_PI / 2) / M_PI; */
   u = 0.5 - (atan2(p.z(), p.x()) / (2 * M_PI));
