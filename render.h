@@ -12,10 +12,10 @@
 #include "camera.h"
 #include "hitable_list.h"
 #include "material.h"
+#include "options.h"
 #include "ray.h"
 #include "sphere.h"
 #include "triangle.h"
-#include "options.h"
 
 class Render : public QObject {
   Q_OBJECT

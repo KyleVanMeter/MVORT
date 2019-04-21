@@ -9,9 +9,12 @@
 
 #include <iostream>
 
-AppMain::AppMain(std::vector<std::unique_ptr<Hitable>> sceneDescription, Options *opt, QWidget *parent = nullptr) : _controller(std::move(sceneDescription),opt) {
-  qDebug() << "in AppMain\n opt res: " << opt->xRes << "x" << opt->yRes << "\n appmain scene size: " << sceneDescription.size() << "\n";
-  //resize(opt->xRes, opt->yRes);
+AppMain::AppMain(std::vector<std::unique_ptr<Hitable>> sceneDescription,
+                 Options *opt, QWidget *parent = nullptr)
+    : _controller(std::move(sceneDescription), opt) {
+  qDebug() << "in AppMain\n opt res: " << opt->xRes << "x" << opt->yRes
+           << "\n appmain scene size: " << sceneDescription.size() << "\n";
+  // resize(opt->xRes, opt->yRes);
 
   auto button_box = new QDialogButtonBox;
   _start_btn = new QPushButton(tr("Start"));
@@ -25,7 +28,8 @@ AppMain::AppMain(std::vector<std::unique_ptr<Hitable>> sceneDescription, Options
   connect(&_controller, &Controller::passData, this, &AppMain::onDataGet);
   QGridLayout *main_layout = nullptr;
   _view = new QGraphicsView();
-  //_image = new QImage(_view->viewport()->width(), _view->viewport()->height(), QImage::Format_ARGB32);
+  //_image = new QImage(_view->viewport()->width(), _view->viewport()->height(),
+  // QImage::Format_ARGB32);
   _image = new QImage(opt->xRes, opt->yRes, QImage::Format_ARGB32);
   _image->fill(QColor(255, 255, 255));
   _scene = new QGraphicsScene;

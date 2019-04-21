@@ -5,16 +5,19 @@
 #include <QColor>
 #include <QDebug>
 
-Controller::Controller(std::vector<std::unique_ptr<Hitable>> sceneDescription, const Options *opt) {
+Controller::Controller(std::vector<std::unique_ptr<Hitable>> sceneDescription,
+                       const Options *opt) {
   qDebug() << "in controller\n";
-  qDebug() << "opt in controller: " << opt->xRes << "\n controller scene size: " << sceneDescription.size();
+  qDebug() << "opt in controller: " << opt->xRes
+           << "\n controller scene size: " << sceneDescription.size();
   Render *render = new Render(*opt);
   render->setScene(std::move(sceneDescription));
   render->moveToThread(&_worker_thread);
   connect(&_worker_thread, &QThread::finished, render, &QObject::deleteLater);
-  //Worker *worker = new Worker();
-  //worker->moveToThread(&_worker_thread);
-  //connect(&_worker_thread, &QThread::finished, worker, &QObject::deleteLater);
+  // Worker *worker = new Worker();
+  // worker->moveToThread(&_worker_thread);
+  // connect(&_worker_thread, &QThread::finished, worker,
+  // &QObject::deleteLater);
 
   connect(this, &Controller::initializedWorkerRequested, render, &Render::init);
   connect(render, &Render::initialized, this, [=](bool success) {

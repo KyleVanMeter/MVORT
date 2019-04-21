@@ -16,7 +16,7 @@ public:
 };
 
 inline bool Hitable_List::hit(const Ray &r, float t_min, float t_max,
-                       Hit_Record &rec) const {
+                              Hit_Record &rec) const {
   Hit_Record temp_rec;
   bool hit_anything = false;
   double closet_so_far = t_max;

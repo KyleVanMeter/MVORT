@@ -2,15 +2,16 @@
 #define CONTROLLER_H
 
 #include "options.h"
+#include <QColor>
 #include <QObject>
 #include <QThread>
 #include <QTimer>
-#include <QColor>
 
 class Controller : public QObject {
   Q_OBJECT
 public:
-  Controller(std::vector<std::unique_ptr<Hitable>> sceneDescription, const Options *opt);
+  Controller(std::vector<std::unique_ptr<Hitable>> sceneDescription,
+             const Options *opt);
   ~Controller();
 
 signals:

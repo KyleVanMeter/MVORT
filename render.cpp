@@ -6,8 +6,8 @@
 #include "sphere.h"
 #include "triangle.h"
 
-#include <QMetaType>
 #include <QDebug>
+#include <QMetaType>
 
 Render::Render(const std::string &filename) {
   assert(!filename.empty());
@@ -18,8 +18,7 @@ Render::Render(const std::string &filename) {
   // length of the delimiters themselves
   unsigned startDelim = _filename.find(".");
   unsigned endDelim = _filename.find(" ");
-  _format.assign(
-      _filename.substr(startDelim + 1, endDelim - (startDelim + 1)));
+  _format.assign(_filename.substr(startDelim + 1, endDelim - (startDelim + 1)));
 
   assert(_format == "png" || _format == "jpg" || _format == "ppm");
 
@@ -49,8 +48,7 @@ Render::Render(const Options &opt) {
   // length of the delimiters themselves
   unsigned startDelim = _filename.find(".");
   unsigned endDelim = _filename.find(" ");
-  _format.assign(
-      _filename.substr(startDelim + 1, endDelim - (startDelim + 1)));
+  _format.assign(_filename.substr(startDelim + 1, endDelim - (startDelim + 1)));
 
   assert(_format == "png" || _format == "jpg" || _format == "ppm");
 
@@ -100,7 +98,9 @@ void Render::setEndTime(float x) { _time1 = x; }
 int Render::getSampleRate() { return _sampleRate; }
 void Render::setSampleRate(int k) { _sampleRate = k; }
 
-std::pair<int, int> Render::getResolution() { return std::make_pair(_xRes, _yRes); }
+std::pair<int, int> Render::getResolution() {
+  return std::make_pair(_xRes, _yRes);
+}
 void Render::setResolution(std::pair<int, int> a) {
   _xRes = a.first;
   _yRes = a.second;
@@ -125,14 +125,15 @@ void Render::setScene(std::vector<std::unique_ptr<Hitable>> sceneDescription) {
 
 Eigen::Vector3f Render::oldColor(const Ray &r, Hitable *world) {
   Hit_Record rec;
-  if(world->hit(r, 0.001, MAXFLOAT, rec)) {
+  if (world->hit(r, 0.001, MAXFLOAT, rec)) {
     Eigen::Vector3f target = rec.p + rec.normal;
     return 0.5 * oldColor(Ray(rec.p, rec.normal), world);
   } else {
     Eigen::Vector3f unit_direction = r.direction().normalized();
     float t = 0.5 * (unit_direction.y() + 1.0);
 
-    return (1.0 - t) * Eigen::Vector3f(1.0, 1.0, 1.0) + t * Eigen::Vector3f(0.5, 0.7, 0.5);
+    return (1.0 - t) * Eigen::Vector3f(1.0, 1.0, 1.0) +
+           t * Eigen::Vector3f(0.5, 0.7, 0.5);
   }
 }
 
@@ -185,7 +186,7 @@ QImage *Render::_Render() {
 
 #pragma omp parallel for
   for (int j = 0; j < ny; j++) {
-    QRgb *line = (QRgb*)image->scanLine(j);
+    QRgb *line = (QRgb *)image->scanLine(j);
     for (int i = 0; i < nx; i++) {
 
       count++;
@@ -205,7 +206,7 @@ QImage *Render::_Render() {
       Eigen::Vector3f rgb = 255.99 * col;
 
       line[i] = qRgb(rgb.x(), rgb.y(), rgb.z());
-      //emit dataGenerated(qRgb color, int x, int y);
+      // emit dataGenerated(qRgb color, int x, int y);
     }
   }
 
@@ -304,13 +305,13 @@ void Render::generateData() {
   Camera cam(_camPos, _camTarget, _camRoll, _vFOV, float(_xRes) / float(_yRes),
              _aperature, _focal, _time0, _time1);
 
-  //int count = 0;
-//#pragma omp parallel for
+  // int count = 0;
+  //#pragma omp parallel for
   for (int j = 0; j < _yRes; j++) {
     for (int i = 0; i < _xRes; i++) {
 
-     //count++;
-     //printf("\rRendering pixel %d out of ALOT", count);
+      // count++;
+      // printf("\rRendering pixel %d out of ALOT", count);
 
       Eigen::Vector3f col(0, 0, 0);
       for (int k = 0; k < _sampleRate; k++) {
@@ -326,7 +327,7 @@ void Render::generateData() {
       Eigen::Vector3f rgb = 255.99 * col;
 
       QRgb color = qRgb(rgb.x(), rgb.y(), rgb.z());
-      //emit dataGenerated(qRgb(rgb.x(), rgb.y(), rgb.z()), i, j);
+      // emit dataGenerated(qRgb(rgb.x(), rgb.y(), rgb.z()), i, j);
       emit dataGenerated(color, i, j);
     }
   }

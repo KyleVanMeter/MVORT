@@ -1,10 +1,10 @@
 #ifndef APPMAIN_H
 #define APPMAIN_H
 
+#include <QColor>
 #include <QDialog>
 #include <QGraphicsView>
 #include <QObject>
-#include <QColor>
 
 #include "controller.h"
 #include "options.h"
@@ -12,7 +12,8 @@
 class AppMain : public QDialog {
   Q_OBJECT
 public:
-  explicit AppMain(std::vector<std::unique_ptr<Hitable>> sceneDescription, Options *opt, QWidget *parent);
+  explicit AppMain(std::vector<std::unique_ptr<Hitable>> sceneDescription,
+                   Options *opt, QWidget *parent);
 
 private slots:
   void onHandleStart();
