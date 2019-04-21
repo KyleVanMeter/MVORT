@@ -306,7 +306,7 @@ void Render::generateData() {
              _aperature, _focal, _time0, _time1);
 
   // int count = 0;
-  //#pragma omp parallel for
+#pragma omp parallel for
   for (int j = 0; j < _yRes; j++) {
     for (int i = 0; i < _xRes; i++) {
 
