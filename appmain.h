@@ -18,7 +18,9 @@ public:
 private slots:
   void onHandleStart();
   void onHandleStop();
-  void onDataGet(const QRgb &newColor, int x, int y);
+  void doRepaint();
+  //void onDataGet(const QRgb &newColor, int x, int y);
+  void onDataGet(const QImage &newImage);
 
 private:
   QPushButton *_start_btn = nullptr;
@@ -27,6 +29,8 @@ private:
   QGraphicsScene *_scene = nullptr;
   Controller _controller;
   QImage *_image = nullptr;
+
+  QTimer _refreshTimer;
 
   int _x;
   int _y;

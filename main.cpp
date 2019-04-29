@@ -74,7 +74,7 @@ Supported filetypes are:\n \
     optionObject.filename = filename;
     optionObject.xRes = 800;
     optionObject.yRes = 800;
-    optionObject.sampleRate = 3;
+    optionObject.sampleRate = 300;
 
     if (input.CMDOptionExists("-rsr")) {
       QString renSampleRate =
@@ -242,7 +242,7 @@ See Assimp documentation for supported filetypes.\n";
       }
     }
 
-    std::string textureFile = "earthmap.jpg";
+    std::string textureFile = "resources/earthmap.jpg";
 
     Texture *checker =
         new CheckerBoard(new ConstantTexture(Eigen::Vector3f(0.5, 0.2, 0.1)),
@@ -261,29 +261,29 @@ See Assimp documentation for supported filetypes.\n";
     scene.push_back(std::unique_ptr<Hitable>(new Sphere(
         Eigen::Vector3f(0, -500.5, -1), 500, new Lambertian(checker))));
 
-    // scene.push_back(std::unique_ptr<Hitable>(
-    //    new Sphere(Eigen::Vector3f(0, 1, -4.75), 2.5, new
-    //    Metal(Eigen::Vector3f(0.8, 0.6, 0.2), 0.3))));
-    // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-    //    Eigen::Vector3f(-4, 2, 1.5), 2.5, new Lambertian(new
-    //    ImageTexture(textureFile)))));
-    // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Eigen::Vector3f(2, 1.5, 0), 2.5, new Dielectic(1.5))));
-    // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Eigen::Vector3f(1, 0, -2), -0.45, new Dielectic(1.5))));
-    // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-    //     Eigen::Vector3f(1, 10, -1), 1.5,
-    //     new DiffuseLight(new ConstantTexture(Eigen::Vector3f(3, 3, 3))))));
-    // scene.push_back(std::unique_ptr<Hitable>(new Sphere(
-    //     Eigen::Vector3f(1, 14, -5), 1.5,
-    //     new DiffuseLight(new ConstantTexture(Eigen::Vector3f(6, 3.5, 2))))));
-    // scene.push_back(std::unique_ptr<Hitable>(new Triangle(Eigen::Vector3f(0,
-    // 0, 0), Eigen::Vector3f(5, 5, 5), Eigen::Vector3f(3,1,0), new
-    // Metal(Eigen::Vector3f(0.1,0.2,0.3), 0.5))));
-    // scene.push_back(std::unique_ptr<Hitable>(
-    //     new Sphere(Eigen::Vector3f(4, 4, -3), 1.5,
-    //                new DiffuseLight(new ConstantTexture(Eigen::Vector3f(2, 1,
-    //                5))))));
+    scene.push_back(std::unique_ptr<Hitable>(
+       new Sphere(Eigen::Vector3f(0, 1, -4.75), 2.5, new
+       Metal(Eigen::Vector3f(0.8, 0.6, 0.2), 0.3))));
+    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+       Eigen::Vector3f(-4, 2, 1.5), 2.5, new Lambertian(new
+       ImageTexture(textureFile)))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Eigen::Vector3f(2, 1.5, 0), 2.5, new Dielectic(1.5))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Eigen::Vector3f(1, 0, -2), -0.45, new Dielectic(1.5))));
+    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+        Eigen::Vector3f(1, 10, -1), 1.5,
+        new DiffuseLight(new ConstantTexture(Eigen::Vector3f(3, 3, 3))))));
+    scene.push_back(std::unique_ptr<Hitable>(new Sphere(
+        Eigen::Vector3f(1, 14, -5), 1.5,
+        new DiffuseLight(new ConstantTexture(Eigen::Vector3f(6, 3.5, 2))))));
+    scene.push_back(std::unique_ptr<Hitable>(new Triangle(Eigen::Vector3f(0,
+    0, 0), Eigen::Vector3f(5, 5, 5), Eigen::Vector3f(3,1,0), new
+    Metal(Eigen::Vector3f(0.1,0.2,0.3), 0.5))));
+    scene.push_back(std::unique_ptr<Hitable>(
+        new Sphere(Eigen::Vector3f(4, 4, -3), 1.5,
+                   new DiffuseLight(new ConstantTexture(Eigen::Vector3f(2, 1,
+                   5))))));
     // a.setScene(std::move(scene));
 
     qDebug() << "before AppMain\n opt xRes: " << optionObject.xRes

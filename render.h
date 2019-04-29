@@ -93,7 +93,8 @@ signals:
   void initialized(bool status);
   void started(bool status);
   void stopped(bool status);
-  void dataGenerated(const QRgb &data, int x, int y);
+  void dataGenerated(const QImage &data);
+  //void dataGenerated(const QRgb &data, int x, int y);
 
 private:
   QImage *_Render();

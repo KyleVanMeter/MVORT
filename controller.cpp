@@ -69,6 +69,9 @@ void Controller::start() {
 
 void Controller::stop() { emit stopWorkerRequested(); }
 
-void Controller::onDataGenerated(const QRgb &data, int x, int y) {
-  emit passData(data, x, y);
+void Controller::onDataGenerated(const QImage &data) {
+  emit passData(data);
 }
+//void Controller::onDataGenerated(const QRgb &data, int x, int y) {
+//  emit passData(data, x, y);
+//}

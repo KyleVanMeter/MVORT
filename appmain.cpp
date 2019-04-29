@@ -34,6 +34,12 @@ AppMain::AppMain(std::vector<std::unique_ptr<Hitable>> sceneDescription,
   _image->fill(QColor(255, 255, 255));
   _scene = new QGraphicsScene;
 
+  _refreshTimer.setTimerType(Qt::PreciseTimer);
+  _refreshTimer.setSingleShot(false);
+  _refreshTimer.setInterval(25);
+  connect(&_refreshTimer, &QTimer::timeout, this, &AppMain::doRepaint);
+  connect(_stop_btn, &QAbstractButton::clicked, &_refreshTimer, &QTimer::stop);
+
   main_layout = new QGridLayout(this);
   main_layout->addWidget(button_box, 1, 0, 1, 2);
   main_layout->addWidget(_view, 2, 0, 50, 50);
@@ -51,11 +57,28 @@ void AppMain::onHandleStop() {
   _controller.stop();
 }
 
-void AppMain::onDataGet(const QRgb &newColor, int x, int y) {
-  _scene->clear();
-  _scene->addPixmap(QPixmap::fromImage(*_image));
-  _view->setScene(_scene);
-  _image->setPixelColor(x, y, newColor);
-
+void AppMain::doRepaint() {
   repaint();
 }
+
+void AppMain::onDataGet(const QImage &newImage) {
+  *_image = newImage;
+  _scene->clear();
+  _scene->addPixmap(QPixmap::fromImage(*_image));
+  if(_image->isNull()) {
+    qDebug() << "_image is null!";
+  }
+
+  if(newImage.isNull()) {
+    qDebug() << "newImage is null!";
+  }
+  _view->setScene(_scene);
+}
+//void AppMain::onDataGet(const QRgb &newColor, int x, int y) {
+//  _scene->clear();
+//  _scene->addPixmap(QPixmap::fromImage(*_image));
+//  _view->setScene(_scene);
+//  _image->setPixelColor(x, y, newColor);
+//
+//  qDebug() << "(" << x << ", " << y << ")";
+//}
