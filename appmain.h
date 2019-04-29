@@ -19,7 +19,7 @@ private slots:
   void onHandleStart();
   void onHandleStop();
   void doRepaint();
-  //void onDataGet(const QRgb &newColor, int x, int y);
+  // void onDataGet(const QRgb &newColor, int x, int y);
   void onDataGet(const QImage &newImage);
 
 private:

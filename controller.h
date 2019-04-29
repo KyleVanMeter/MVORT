@@ -25,10 +25,10 @@ signals:
   void startWorkerRequested();
   void stopWorkerRequested();
   void passData(const QImage &data);
-  //void passData(const QRgb &data, int x, int y);
+  // void passData(const QRgb &data, int x, int y);
 
 private slots:
-  //void onDataGenerated(const QRgb &data, int x, int y);
+  // void onDataGenerated(const QRgb &data, int x, int y);
   void onDataGenerated(const QImage &data);
 
 private:

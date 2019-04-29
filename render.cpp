@@ -206,7 +206,6 @@ QImage *Render::_Render() {
       Eigen::Vector3f rgb = 255.99 * col;
 
       line[i] = qRgb(rgb.x(), rgb.y(), rgb.z());
-      // emit dataGenerated(qRgb color, int x, int y);
     }
   }
 
@@ -221,7 +220,6 @@ void Render::makeRender() {
   QString qfilename = QString::fromStdString(_filename);
   const char *qformat = _format.c_str();
 
-  // TODO: Look into updating this so it can be written (QPainter) is real time
   image->save(qfilename, qformat, 100);
 
   std::cout << "\nDone.\n";
@@ -318,7 +316,6 @@ void Render::generateData() {
         float u = float(i + drand48()) / float(nx);
         float v = float(j + drand48()) / float(ny);
         Ray r = cam.get_ray(u, v);
-        //col += oldColor(r, _world);
         col += color(r, _world, 0);
       }
 
@@ -328,46 +325,9 @@ void Render::generateData() {
       Eigen::Vector3f rgb = 255.99 * col;
 
       line[i] = qRgb(rgb.x(), rgb.y(), rgb.z());
-      // emit dataGenerated(qRgb color, int x, int y);
     }
-    emit dataGenerated(QImage(*image));
+    emit dataGenerated(*image);
   }
 
-  //emit dataGenerated(image->mirrored(false, true));
   emit dataGenerated(*image);
-  //*image = image->mirrored(false, true);
-  //return (image);
 }
-//void Render::generateData() {
-//  qRegisterMetaType<QRgb>("QRgb");
-//  qDebug() << "generate, " << _xRes << "x" << _yRes << "\n";
-//  Camera cam(_camPos, _camTarget, _camRoll, _vFOV, float(_xRes) / float(_yRes),
-//             _aperature, _focal, _time0, _time1);
-//
-//  // int count = 0;
-////#pragma omp parallel for
-//  for (int j = 0; j < _yRes; j++) {
-//    for (int i = 0; i < _xRes; i++) {
-//
-//      // count++;
-//      // printf("\rRendering pixel %d out of ALOT", count);
-//
-//      Eigen::Vector3f col(0, 0, 0);
-//      for (int k = 0; k < _sampleRate; k++) {
-//        float u = float(i + drand48()) / float(_xRes);
-//        float v = float(j + drand48()) / float(_yRes);
-//        Ray r = cam.get_ray(u, v);
-//        col += oldColor(r, _world);
-//      }
-//
-//      col /= float(_sampleRate);
-//      col = Eigen::Vector3f(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
-//
-//      Eigen::Vector3f rgb = 255.99 * col;
-//
-//      QRgb color = qRgb(rgb.x(), rgb.y(), rgb.z());
-//      // emit dataGenerated(qRgb(rgb.x(), rgb.y(), rgb.z()), i, j);
-//      emit dataGenerated(color, i, j);
-//    }
-//  }
-//}

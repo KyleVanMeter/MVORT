@@ -14,10 +14,6 @@ Controller::Controller(std::vector<std::unique_ptr<Hitable>> sceneDescription,
   render->setScene(std::move(sceneDescription));
   render->moveToThread(&_worker_thread);
   connect(&_worker_thread, &QThread::finished, render, &QObject::deleteLater);
-  // Worker *worker = new Worker();
-  // worker->moveToThread(&_worker_thread);
-  // connect(&_worker_thread, &QThread::finished, worker,
-  // &QObject::deleteLater);
 
   connect(this, &Controller::initializedWorkerRequested, render, &Render::init);
   connect(render, &Render::initialized, this, [=](bool success) {
@@ -69,9 +65,7 @@ void Controller::start() {
 
 void Controller::stop() { emit stopWorkerRequested(); }
 
-void Controller::onDataGenerated(const QImage &data) {
-  emit passData(data);
-}
-//void Controller::onDataGenerated(const QRgb &data, int x, int y) {
+void Controller::onDataGenerated(const QImage &data) { emit passData(data); }
+// void Controller::onDataGenerated(const QRgb &data, int x, int y) {
 //  emit passData(data, x, y);
 //}

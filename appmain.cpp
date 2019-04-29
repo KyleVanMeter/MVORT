@@ -57,24 +57,22 @@ void AppMain::onHandleStop() {
   _controller.stop();
 }
 
-void AppMain::doRepaint() {
-  repaint();
-}
+void AppMain::doRepaint() { repaint(); }
 
 void AppMain::onDataGet(const QImage &newImage) {
   *_image = newImage;
   _scene->clear();
   _scene->addPixmap(QPixmap::fromImage(*_image));
-  if(_image->isNull()) {
+  if (_image->isNull()) {
     qDebug() << "_image is null!";
   }
 
-  if(newImage.isNull()) {
+  if (newImage.isNull()) {
     qDebug() << "newImage is null!";
   }
   _view->setScene(_scene);
 }
-//void AppMain::onDataGet(const QRgb &newColor, int x, int y) {
+// void AppMain::onDataGet(const QRgb &newColor, int x, int y) {
 //  _scene->clear();
 //  _scene->addPixmap(QPixmap::fromImage(*_image));
 //  _view->setScene(_scene);
