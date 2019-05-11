@@ -5,6 +5,8 @@
 #include <QDialog>
 #include <QGraphicsView>
 #include <QObject>
+#include <QProgressBar>
+#include <QGridLayout>
 
 #include "controller.h"
 #include "options.h"
@@ -23,6 +25,8 @@ private slots:
   void onDataGet(const QImage &newImage);
 
 private:
+  QGridLayout *main_layout = nullptr;
+  QProgressBar *_progress = nullptr;
   QPushButton *_start_btn = nullptr;
   QPushButton *_stop_btn = nullptr;
   QGraphicsView *_view = nullptr;

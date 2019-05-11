@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QGuiApplication>
 #include <QPushButton>
+#include <QProgressBar>
 
 #include <iostream>
 
@@ -26,7 +27,7 @@ AppMain::AppMain(std::vector<std::unique_ptr<Hitable>> sceneDescription,
   connect(_stop_btn, &QAbstractButton::clicked, this, &AppMain::onHandleStop);
 
   connect(&_controller, &Controller::passData, this, &AppMain::onDataGet);
-  QGridLayout *main_layout = nullptr;
+  //QGridLayout *main_layout = nullptr;
   _view = new QGraphicsView();
   //_image = new QImage(_view->viewport()->width(), _view->viewport()->height(),
   // QImage::Format_ARGB32);
@@ -39,20 +40,27 @@ AppMain::AppMain(std::vector<std::unique_ptr<Hitable>> sceneDescription,
   _refreshTimer.setInterval(25);
   connect(&_refreshTimer, &QTimer::timeout, this, &AppMain::doRepaint);
   connect(_stop_btn, &QAbstractButton::clicked, &_refreshTimer, &QTimer::stop);
+  _progress = new QProgressBar();
+  _progress->setMaximum(opt->yRes);
+  _progress->setMinimum(0);
 
   main_layout = new QGridLayout(this);
   main_layout->addWidget(button_box, 1, 0, 1, 2);
-  main_layout->addWidget(_view, 2, 0, 50, 50);
+  main_layout->addWidget(_view, 2, 0, 50, -1);
 
   setWindowTitle(QGuiApplication::applicationDisplayName());
+
 }
 
 void AppMain::onHandleStart() {
+  main_layout->addWidget(_progress);
   qDebug() << "Start clicked";
   _controller.start();
 }
 
 void AppMain::onHandleStop() {
+  _progress->hide();
+  main_layout->removeWidget(_progress);
   qDebug() << "Stop clicked";
   _controller.stop();
 }
@@ -60,6 +68,7 @@ void AppMain::onHandleStop() {
 void AppMain::doRepaint() { repaint(); }
 
 void AppMain::onDataGet(const QImage &newImage) {
+  _progress->setValue(_progress->value()+1);
   *_image = newImage;
   _scene->clear();
   _scene->addPixmap(QPixmap::fromImage(*_image));
@@ -72,11 +81,3 @@ void AppMain::onDataGet(const QImage &newImage) {
   }
   _view->setScene(_scene);
 }
-// void AppMain::onDataGet(const QRgb &newColor, int x, int y) {
-//  _scene->clear();
-//  _scene->addPixmap(QPixmap::fromImage(*_image));
-//  _view->setScene(_scene);
-//  _image->setPixelColor(x, y, newColor);
-//
-//  qDebug() << "(" << x << ", " << y << ")";
-//}
